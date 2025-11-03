@@ -1,90 +1,72 @@
-/*
- * --- THIS CODE GOES IN main.cpp ---
- * * It assumes Phase 1 and Phase 2 are complete
- * and you have a working "adin_netif_init()" function
- * that starts the network.
- */
-
 #include <Arduino.h>
-#include <WebServer.h> // The standard Arduino WebServer library
-#include "SPIDevice.h"
-#include "ADIN1110.h"
 
-// --- Your objects from before ---
-const int ADIN_CS_PIN = 5;
-SPIDevice adinSPI(ADIN_CS_PIN, 1000000, MSBFIRST, SPI_MODE0);
-ADIN1110 adin(adinSPI);
+// === Konfiguration ===
+const int pwmInputPin  = 25;  // Eingangspin für PWM-Signal
+const int pwmOutputPin = 26;  // Ausgangspin für PWM-Erzeugung
 
-// --- The standard Web Server object ---
-WebServer server(80); // Create a server on port 80
+// Für die PWM-Ausgabe
+const int pwmChannel   = 0;
+const int pwmResolution = 8;  // 8 Bit = Wertebereich 0–255
+float pwmOutputFreq = 2000.0; // Ausgangsfrequenz in Hz (variabel)
 
-// --- Your custom network init function (from Phase 2) ---
-// This function will initialize the ADIN1110 and esp_netif
-// and connect to the network.
-void my_network_init() {
-  // 1. Initialize the ADIN1110 chip
-  if (!adin.begin()) {
-    Serial.println("Failed to init ADIN1110");
-    while(true) delay(1);
-  }
+// Für die Frequenzmessung
+volatile unsigned long lastRiseTime = 0;
+volatile unsigned long period = 0;
+volatile bool newCycle = false;
 
-  // 2. TODO: Start the esp_netif glue driver (The hard part)
-  //    ... This would involve:
-  //    ... esp_netif_init()
-  //    ... create_my_netif_driver()
-  //    ... attach_the_isr()
-  //    ... create_the_rx_task()
-  //    ... esp_netif_attach()
-
-  Serial.println("Network driver started. Waiting for link...");
-
-  // 3. Wait for the 10BASE-T1L link to be active
-  while (!adin.isLinkUp()) {
-    delay(100);
-  }
-  Serial.println("Network Link is UP.");
-
-  // 4. TODO: Wait for lwIP to get an IP address
-  //    ... (code to wait for GOT_IP event)
-  // Serial.print("IP Address: ");
-  // Serial.println(Ethernet.localIP()); // (Or the esp_netif equivalent)
+// === Interrupt-Service-Routine ===
+void IRAM_ATTR handlePwmRise() {
+  unsigned long now = micros();
+  period = now - lastRiseTime;
+  lastRiseTime = now;
+  newCycle = true;
 }
 
-// --- Web server "handler" functions ---
-void handleRoot() {
-  String html = "<html><head><title>ESP32 SPE Server</title></head>";
-  html += "<body style='font-family: sans-serif;'>";
-  html += "<h1>Hello from 10BASE-T1L!</h1>";
-  html += "<p>This page is hosted on an ESP32 over Single Pair Ethernet.</p>";
-  html += "</body></html>";
-  
-  server.send(200, "text/html", html);
-}
-
-void handleNotFound() {
-  server.send(404, "text/plain", "Not Found");
-}
-
-
-// --- Main Setup and Loop ---
+// === Setup ===
 void setup() {
   Serial.begin(115200);
-  delay(1000);
-  Serial.println("--- Starting ADIN1110 Web Server ---");
 
-  // This one function call does all the complex network setup
-  my_network_init(); 
+  // Eingangspin konfigurieren und Interrupt aktivieren
+  pinMode(pwmInputPin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(pwmInputPin), handlePwmRise, RISING);
 
-  // --- Web Server Setup ---
-  // Once the network is up, this is all standard code
-  server.on("/", handleRoot);
-  server.onNotFound(handleNotFound);
-  server.begin(); // Start the web server
-  Serial.println("Web server started. Open the IP address in a browser.");
+  // PWM-Ausgang konfigurieren
+  ledcSetup(pwmChannel, pwmOutputFreq, pwmResolution);
+  ledcAttachPin(pwmOutputPin, pwmChannel);
+  ledcWrite(pwmChannel, 128); // 50 % Duty-Cycle (128/255)
+  
+  Serial.println("PWM-Frequenzmessung und -Ausgabe gestartet...");
 }
 
+// === Loop ===
 void loop() {
-  // This function must be called in the loop
-  // to allow the server to handle incoming client requests.
-  server.handleClient();
+  static unsigned long lastPrint = 0;
+  static float measuredFreq = 0.0;
+
+  if (newCycle) {
+    newCycle = false;
+    if (period > 0) {
+      measuredFreq = 1000000.0 / period; // Hz berechnen (Mikrosekunden → Sekunden)
+    }
+  }
+
+  // Beispielhafte Ausgabe alle 500 ms
+  if (millis() - lastPrint > 500) {
+    lastPrint = millis();
+    Serial.print("Gemessene Frequenz (Eingang): ");
+    Serial.print(measuredFreq, 2);
+    Serial.println(" Hz");
+    Serial.print("Ausgangsfrequenz (Soll): ");
+    Serial.print(pwmOutputFreq, 2);
+    Serial.println(" Hz\n");
+  }
+
+  // Beispiel: Frequenzänderung der Ausgabe nach 5 Sekunden
+  if (millis() > 5000 && pwmOutputFreq != 1000.0) {
+    pwmOutputFreq = 1000.0; // Neue Ausgangsfrequenz setzen
+    ledcSetup(pwmChannel, pwmOutputFreq, pwmResolution);
+    ledcAttachPin(pwmOutputPin, pwmChannel);
+    ledcWrite(pwmChannel, 128);
+    Serial.println("Ausgangsfrequenz geändert auf 1000 Hz");
+  }
 }

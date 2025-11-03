@@ -1,3 +1,4 @@
+/*
 #include <Arduino.h>
 
 // === Konfiguration ===
@@ -70,3 +71,4 @@ void loop() {
     Serial.println("Ausgangsfrequenz geändert auf 1000 Hz");
   }
 }
+  */
