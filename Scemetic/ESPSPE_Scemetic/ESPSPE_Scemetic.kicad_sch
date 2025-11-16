@@ -4596,7 +4596,7 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 152.4) (xy 210.82 157.48)
+			(xy 210.82 143.51) (xy 210.82 157.48)
 		)
 		(stroke
 			(width 0)
@@ -4973,16 +4973,6 @@
 			(type default)
 		)
 		(uuid "42885348-cb71-470f-9de3-7f2573aecc8d")
-	)
-	(wire
-		(pts
-			(xy 210.82 143.51) (xy 210.82 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "458834c5-7fbe-42ad-9397-f1d211661451")
 	)
 	(wire
 		(pts
@@ -5386,6 +5376,16 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 143.51) (xy 248.92 157.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "713a89dd-4837-4b80-84e2-9454a9b63a36")
+	)
+	(wire
+		(pts
 			(xy 229.87 134.62) (xy 229.87 138.43)
 		)
 		(stroke
@@ -5676,23 +5676,13 @@
 	)
 	(wire
 		(pts
-			(xy 229.87 143.51) (xy 229.87 147.32)
+			(xy 229.87 143.51) (xy 229.87 157.48)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "a8bfd956-e018-421d-973a-674d34d1cd57")
-	)
-	(wire
-		(pts
-			(xy 248.92 152.4) (xy 248.92 157.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a96e5f09-d392-442d-8fd6-5c9bb3e54810")
 	)
 	(wire
 		(pts
@@ -5713,16 +5703,6 @@
 			(type default)
 		)
 		(uuid "ab865b1d-45a0-47dd-b6d3-07966a980650")
-	)
-	(wire
-		(pts
-			(xy 229.87 152.4) (xy 229.87 157.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ac154fa9-7649-49e2-a9f3-b4e74d97989e")
 	)
 	(wire
 		(pts
@@ -6173,16 +6153,6 @@
 			(type default)
 		)
 		(uuid "ee442f44-5127-4db9-bff7-5ad50798e68e")
-	)
-	(wire
-		(pts
-			(xy 248.92 143.51) (xy 248.92 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ef4be683-8f06-40ec-8a74-ec48ab7545aa")
 	)
 	(wire
 		(pts
@@ -8655,76 +8625,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Jumper:Jumper_2_Small_Bridged")
-		(at 248.92 149.86 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "476fd6a2-cc84-4990-93e3-039542829f1d")
-		(property "Reference" "JP8"
-			(at 250.19 148.5899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "LINK_ST"
-			(at 250.19 151.1299 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 248.92 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 248.92 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Jumper, 2-pole, small symbol, bridged"
-			(at 248.92 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "78bcf774-00f6-4804-bf62-6f4607d33eec")
-		)
-		(pin "2"
-			(uuid "c4d3c3ee-2478-409c-8bac-e9264b97fc75")
-		)
-		(instances
-			(project "ESPSPE_Scemetic"
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "JP8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Jumper:Jumper_2_Small_Open")
 		(at 127 137.16 270)
 		(unit 1)
@@ -8986,76 +8886,6 @@
 			(project "ESPSPE_Scemetic"
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "#PWR030")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Jumper:Jumper_2_Small_Bridged")
-		(at 229.87 149.86 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4b2547de-53b3-4920-956a-abe5d665da0d")
-		(property "Reference" "JP7"
-			(at 231.14 148.5899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "LED_1"
-			(at 231.14 151.1299 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 229.87 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 229.87 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Jumper, 2-pole, small symbol, bridged"
-			(at 229.87 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ed91482d-42ad-4e44-a1df-10716692d716")
-		)
-		(pin "2"
-			(uuid "f44eb3d9-b0dc-41c8-8a32-070384ebe877")
-		)
-		(instances
-			(project "ESPSPE_Scemetic"
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "JP7")
 					(unit 1)
 				)
 			)
@@ -10567,76 +10397,6 @@
 			(project "ESPSPE_Scemetic"
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "D4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Jumper:Jumper_2_Small_Bridged")
-		(at 210.82 149.86 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7cad5d34-dfa6-4582-b996-dfc6835faee5")
-		(property "Reference" "JP6"
-			(at 212.09 148.5899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "LED_0"
-			(at 212.09 151.1299 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 210.82 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 210.82 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Jumper, 2-pole, small symbol, bridged"
-			(at 210.82 149.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d54ffc0b-3abb-401d-9751-890b18fe3724")
-		)
-		(pin "2"
-			(uuid "e9f816e7-c95b-44c8-8c76-65dcd9f98b06")
-		)
-		(instances
-			(project ""
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "JP6")
 					(unit 1)
 				)
 			)
