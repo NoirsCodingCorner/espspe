@@ -1,4 +1,4 @@
-26387245735794926
+26420740668685393
 ADIN1110
 LFCSP-40
 40-LFCSP (Lead Frame Chip Scale Package) 6x6mm body and 0.75 mm Package Height -  ADIN1110 datasheet
@@ -57672,6 +57672,104 @@ ceramic
 0
 3
 3
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-12SMX
+Quartz Crystal, body 5x7x1.2mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/WE-XTAL-12SMX
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-CFPX-104
+Quartz Crystal, body 3.2x5x1mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/CFPX-104
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-CFPX-180
+Quartz Crystal, body 2.7x3.4x0.8mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/CFPX-180
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-CFPX-218
+Quartz Crystal, body 2x2.5x0.65mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/CFPX-218
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-HC49-4HSMX
+Quartz Crystal, body 11.3x4.7x4.5mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/HC49_4HSMX
+SMT
+0
+2
+2
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-IQXC-26
+Quartz Crystal, body 1.2x1.6x0.4mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/IQXC-26
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-IQXC-42
+Quartz Crystal, body 1.6x2x0.5mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/IQXC-42
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Quartz-IQXC-240
+Quartz Crystal, body 1x1.2x0.33mm, https://www.we-online.com/en/components/products/WE-XTAL#/articles/IQXC-240
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-85SMX
+Watch Crystal, body 3.8x8.7x2.5mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/85SMX
+SMT
+0
+4
+4
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-CFPX-56
+Watch Crystal, body 9.3x2.79x2mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/CFPX-56
+SMT
+0
+2
+2
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-CFPX-217
+Watch Crystal, body 3.2x1.5x0.9mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/CFPX-217
+SMT
+0
+2
+2
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-IQXC-25
+Watch Crystal, body 2x1.2x0.6mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/IQXC-25
+SMT
+0
+2
+2
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-IQXC-90
+Watch Crystal, body 1.6x1x0.5mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/IQXC-90
+SMT
+0
+2
+2
+Crystal_SMD_Wurth
+Y_Wurth_WE-XTAL_Watch-IQXC-146
+Watch Crystal, body 1.05x1.27x0.5mm, https://www.we-online.com/en/components/products/WE-XTAL_WATCHCRYSTAL#/articles/IQXC-146
+SMT
+0
+4
+4
 DEVKIT_V1_ESP32-WROOM-32
 MODULE_DEVKIT_V1_ESP32-WROOM-32
 
@@ -67689,6 +67787,27 @@ solder jumper open
 0
 3
 3
+KiCad
+SOIC127P1030X265-20N
+(SO)20-Lead(SOIC)
+Integrated Circuit
+0
+20
+20
+KiCad_ZDiode_8pf
+UDZUVFHTE1756B
+UMD2_2024-9
+Diode ESD (Uni-directional)
+0
+2
+2
+KiCad_Z_diode
+ESD7381MUT5G
+X3DFN2,0.62x0.32, 0.355P, (0201)
+TVS Diode (Uni-directional)
+0
+2
+2
 LED_SMD
 LED-APA102-2020
 http://www.led-color.com/upload/201604/APA102-2020%20SMD%20LED.pdf
@@ -103547,6 +103666,20 @@ Transformer_SMD
 Transformer_Wurth_WE-AGDT-EP7
 WE-AGDT Auxiliary Gate Drive Transformer EP7, https://www.we-online.com/components/products/datasheet/750319177.pdf
 auxiliary gate drive transformer
+0
+8
+8
+Transformer_SMD_Wurth
+T_Wurth_WE-SPE_749070010
+Single Pair Ethernet, body 7.4x5.5x4.6mm, https://www.we-online.com/en/components/products/datasheet/749070010?ki
+SMT
+0
+4
+4
+Transformer_SMD_Wurth
+T_Wurth_WE-SPE_749070011
+Single Pair Ethernet, body 6.5x6.1x5.46mm, https://www.we-online.com/en/components/products/datasheet/749070011?ki
+SMT
 0
 8
 8

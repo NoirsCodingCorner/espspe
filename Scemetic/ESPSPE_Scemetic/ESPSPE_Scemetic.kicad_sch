@@ -906,6 +906,128 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector:Conn_01x01_Pin"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x01_Pin"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x01, script generated"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x01_Pin_1_1"
+				(rectangle
+					(start 0.8636 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 0.8636 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Screw_Terminal_01x02"
 			(pin_names
 				(offset 1.016)
@@ -2467,156 +2589,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:D_Zener"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "D"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "D_Zener"
-				(at 0 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Zener diode"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "diode"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "D_Zener_0_1"
-				(polyline
-					(pts
-						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -0.762 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 0) (xy -1.27 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "D_Zener_1_1"
-				(pin passive line
-					(at -3.81 0 0)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 3.81 0 180)
-					(length 2.54)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:LED_Small"
 			(pin_numbers
 				(hide yes)
@@ -3847,6 +3819,234 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "UDZUVFHTE-175_6B:UDZUVFHTE-175.6B"
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 10.16 8.89 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+				)
+			)
+			(property "Value" "UDZUVFHTE-175.6B"
+				(at 10.16 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+				)
+			)
+			(property "Footprint" "UDZUVFHTE1756B"
+				(at 10.16 -93.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/discrete/diode/zener/udzuvfhte-175.6b-e.pdf"
+				(at 10.16 -193.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Description" "3.3V, UMD2, Automotive Transient Voltage Suppressor (AEC-Q101 Qualified)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Height" "0.9"
+				(at 10.16 -393.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Mouser Part Number" ""
+				(at 10.16 -493.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Mouser Price/Stock" ""
+				(at 10.16 -593.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Name" "ROHM Semiconductor"
+				(at 10.16 -693.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Part_Number" "UDZUVFHTE-175.6B"
+				(at 10.16 -793.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(symbol "UDZUVFHTE-175.6B_1_1"
+				(polyline
+					(pts
+						(xy 2.54 0) (xy 5.08 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 2.54) (xy 5.08 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 0) (xy 10.16 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 -2.54) (xy 6.604 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 -2.54) (xy 5.08 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 -2.54) (xy 10.16 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 12.7 0) (xy 10.16 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 0 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 15.24 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:+3.3V"
 			(power)
 			(pin_numbers
@@ -4221,7 +4421,7 @@
 	)
 	(text "standoff Volt. >= 3.3V"
 		(exclude_from_sim no)
-		(at 192.532 61.722 0)
+		(at 184.912 36.322 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4232,7 +4432,7 @@
 	)
 	(text "Benötigen wir hier eine spezielle Bauform / Marke? "
 		(exclude_from_sim no)
-		(at 231.14 37.084 0)
+		(at 272.542 68.834 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4271,6 +4471,12 @@
 		(uuid "1302f58d-f811-4244-85b6-f45df32ad27a")
 	)
 	(junction
+		(at 246.38 64.77)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2278d558-3c18-4847-b147-a07c8c28cf0e")
+	)
+	(junction
 		(at 71.12 71.12)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4301,22 +4507,16 @@
 		(uuid "63067e79-6748-4e02-9d8b-6c12472a92c5")
 	)
 	(junction
-		(at 234.95 53.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "70e5d66d-a1eb-4205-b689-f1cb0937807e")
-	)
-	(junction
 		(at 200.66 96.52)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "736b82a4-3caa-4c94-953e-0b438863de69")
 	)
 	(junction
-		(at 246.38 43.18)
+		(at 246.38 30.48)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "87854029-d5fe-4b3e-b09d-83d8a7a61d81")
+		(uuid "89ef3b5f-8127-485f-8294-a0add295b16c")
 	)
 	(junction
 		(at 215.9 96.52)
@@ -4397,6 +4597,18 @@
 		(uuid "d42e82a5-b8f6-4ae9-a452-dd8d0569902a")
 	)
 	(junction
+		(at 234.95 53.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d4ae0f47-9ed4-4ae4-8bf1-2234c18dc0e7")
+	)
+	(junction
+		(at 237.49 43.18)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f2f51dc3-3730-4a07-a706-842c951d70c4")
+	)
+	(junction
 		(at 86.36 71.12)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4435,10 +4647,6 @@
 	(no_connect
 		(at 35.56 144.78)
 		(uuid "265c36f0-8549-4175-9f96-167fb38a5735")
-	)
-	(no_connect
-		(at 35.56 182.88)
-		(uuid "2934d49c-384f-4006-9535-075ff37629a1")
 	)
 	(no_connect
 		(at 76.2 149.86)
@@ -4566,6 +4774,16 @@
 	)
 	(wire
 		(pts
+			(xy 186.69 39.37) (xy 186.69 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "018bfdab-5eb2-4a2c-8409-dad408ec5a36")
+	)
+	(wire
+		(pts
 			(xy 71.12 71.12) (xy 73.66 71.12)
 		)
 		(stroke
@@ -4573,6 +4791,26 @@
 			(type default)
 		)
 		(uuid "02b7ee55-993a-4829-9150-2c1d2d6e14df")
+	)
+	(wire
+		(pts
+			(xy 241.3 64.77) (xy 246.38 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0363d009-c55d-4e99-a697-6049c39d9d9a")
+	)
+	(wire
+		(pts
+			(xy 246.38 46.99) (xy 246.38 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0527869b-45e2-44e9-98ae-2d638c915946")
 	)
 	(wire
 		(pts
@@ -4613,16 +4851,6 @@
 			(type default)
 		)
 		(uuid "0dc06d68-d741-451d-87b9-a91e0e469cd8")
-	)
-	(wire
-		(pts
-			(xy 246.38 43.18) (xy 246.38 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "10beb5e9-934f-45cb-a27b-9c1446a34d99")
 	)
 	(wire
 		(pts
@@ -4816,16 +5044,6 @@
 	)
 	(wire
 		(pts
-			(xy 186.69 48.26) (xy 186.69 49.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "35540470-8199-4d34-ba40-0c7e1dc2571b")
-	)
-	(wire
-		(pts
 			(xy 80.01 50.8) (xy 80.01 52.07)
 		)
 		(stroke
@@ -4893,6 +5111,16 @@
 			(type default)
 		)
 		(uuid "3cd6a7d9-6c80-4223-b279-8b064d69b27a")
+	)
+	(wire
+		(pts
+			(xy 246.38 30.48) (xy 246.38 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d232a1c-91ef-4769-a852-af60b5bcdfb3")
 	)
 	(wire
 		(pts
@@ -4996,16 +5224,6 @@
 	)
 	(wire
 		(pts
-			(xy 191.77 62.23) (xy 191.77 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4755b6bc-15ff-4aec-a502-15e83b16db8d")
-	)
-	(wire
-		(pts
 			(xy 210.82 157.48) (xy 205.74 157.48)
 		)
 		(stroke
@@ -5036,6 +5254,16 @@
 	)
 	(wire
 		(pts
+			(xy 252.73 30.48) (xy 246.38 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4a5a673d-4d15-4f38-8517-d17cbc8a31a6")
+	)
+	(wire
+		(pts
 			(xy 86.36 67.31) (xy 104.14 67.31)
 		)
 		(stroke
@@ -5046,16 +5274,6 @@
 	)
 	(wire
 		(pts
-			(xy 228.6 43.18) (xy 246.38 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4c7ecca6-9c51-434d-b188-c95bd8f33ee7")
-	)
-	(wire
-		(pts
 			(xy 102.87 49.53) (xy 104.14 49.53)
 		)
 		(stroke
@@ -5063,6 +5281,16 @@
 			(type default)
 		)
 		(uuid "4ca41408-255c-4648-ba0b-862589e8abef")
+	)
+	(wire
+		(pts
+			(xy 191.77 71.12) (xy 191.77 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ce37aee-2869-4b3c-99bd-abe341b91310")
 	)
 	(wire
 		(pts
@@ -5093,6 +5321,16 @@
 			(type default)
 		)
 		(uuid "51fb7feb-b5ce-4559-9dae-d9aa462c1435")
+	)
+	(wire
+		(pts
+			(xy 246.38 64.77) (xy 252.73 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54516d60-93fb-418a-be5b-6f372b7e6ed2")
 	)
 	(wire
 		(pts
@@ -5246,6 +5484,16 @@
 	)
 	(wire
 		(pts
+			(xy 186.69 60.96) (xy 186.69 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66902653-30af-406b-b9f7-f45593adaa40")
+	)
+	(wire
+		(pts
 			(xy 179.07 55.88) (xy 181.61 55.88)
 		)
 		(stroke
@@ -5273,16 +5521,6 @@
 			(type default)
 		)
 		(uuid "6825f0f9-29a8-4a10-9c7c-5735f93f8265")
-	)
-	(wire
-		(pts
-			(xy 186.69 40.64) (xy 186.69 39.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "696db20a-d82f-4e90-be81-6a5cbdc8bdbf")
 	)
 	(wire
 		(pts
@@ -5366,6 +5604,16 @@
 	)
 	(wire
 		(pts
+			(xy 246.38 64.77) (xy 246.38 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "70435346-c36a-4a9d-89b3-bb84fc549a35")
+	)
+	(wire
+		(pts
 			(xy 146.05 120.65) (xy 146.05 123.19)
 		)
 		(stroke
@@ -5436,7 +5684,7 @@
 	)
 	(wire
 		(pts
-			(xy 246.38 63.5) (xy 246.38 64.77)
+			(xy 237.49 48.26) (xy 237.49 49.53)
 		)
 		(stroke
 			(width 0)
@@ -5616,6 +5864,16 @@
 	)
 	(wire
 		(pts
+			(xy 241.3 53.34) (xy 241.3 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9bff5f4b-4b97-4386-ac55-3166d81497ec")
+	)
+	(wire
+		(pts
 			(xy 163.83 54.61) (xy 163.83 55.88)
 		)
 		(stroke
@@ -5623,6 +5881,16 @@
 			(type default)
 		)
 		(uuid "9c3b7bc0-f806-4bc4-b222-f68cc85721bc")
+	)
+	(wire
+		(pts
+			(xy 234.95 53.34) (xy 241.3 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9c3e4613-1ab5-4aac-aed7-2d16b04fdfd2")
 	)
 	(wire
 		(pts
@@ -5636,13 +5904,13 @@
 	)
 	(wire
 		(pts
-			(xy 246.38 43.18) (xy 252.73 43.18)
+			(xy 237.49 43.18) (xy 241.3 43.18)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a201d999-3b27-4500-bd57-4a3894fed0fc")
+		(uuid "a2bff96c-4945-4733-a1f9-c4333c2a6b18")
 	)
 	(wire
 		(pts
@@ -5776,6 +6044,16 @@
 	)
 	(wire
 		(pts
+			(xy 241.3 43.18) (xy 241.3 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b69fb680-9ac1-469c-a150-ce9d7e1b684a")
+	)
+	(wire
+		(pts
 			(xy 163.83 55.88) (xy 157.48 55.88)
 		)
 		(stroke
@@ -5886,7 +6164,7 @@
 	)
 	(wire
 		(pts
-			(xy 191.77 54.61) (xy 191.77 53.34)
+			(xy 191.77 53.34) (xy 191.77 55.88)
 		)
 		(stroke
 			(width 0)
@@ -5986,6 +6264,16 @@
 	)
 	(wire
 		(pts
+			(xy 228.6 43.18) (xy 237.49 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d34db952-3465-4167-87c4-1fa9dee3550b")
+	)
+	(wire
+		(pts
 			(xy 149.86 39.37) (xy 157.48 39.37)
 		)
 		(stroke
@@ -6076,16 +6364,6 @@
 	)
 	(wire
 		(pts
-			(xy 234.95 53.34) (xy 252.73 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e0c7324b-6b45-4c47-ab06-4f921c58841f")
-	)
-	(wire
-		(pts
 			(xy 237.49 96.52) (xy 243.84 96.52)
 		)
 		(stroke
@@ -6096,7 +6374,7 @@
 	)
 	(wire
 		(pts
-			(xy 252.73 43.18) (xy 252.73 46.99)
+			(xy 252.73 30.48) (xy 252.73 48.26)
 		)
 		(stroke
 			(width 0)
@@ -6226,7 +6504,7 @@
 	)
 	(wire
 		(pts
-			(xy 252.73 49.53) (xy 252.73 53.34)
+			(xy 252.73 50.8) (xy 252.73 64.77)
 		)
 		(stroke
 			(width 0)
@@ -6243,6 +6521,26 @@
 			(type default)
 		)
 		(uuid "f6f02942-9857-4070-b030-1b6df0af4cff")
+	)
+	(wire
+		(pts
+			(xy 241.3 30.48) (xy 246.38 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7ef15be-f162-43cd-8537-fd795c63f1b1")
+	)
+	(wire
+		(pts
+			(xy 34.29 182.88) (xy 35.56 182.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f89785d0-667e-46c5-be9c-a14369828daf")
 	)
 	(wire
 		(pts
@@ -7611,76 +7909,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D_Zener")
-		(at 186.69 44.45 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "124504c4-3a88-40f5-bbb1-bb30732754a5")
-		(property "Reference" "D1"
-			(at 189.23 43.1799 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "D_Zener"
-			(at 189.23 45.7199 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Zener diode"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "22d4811b-6f2f-4537-ad8c-9576807f0971")
-		)
-		(pin "2"
-			(uuid "2b8c0b19-c369-4fd2-aa42-1580fe2fa0fe")
-		)
-		(instances
-			(project ""
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 101.6 95.25 0)
 		(unit 1)
@@ -7951,7 +8179,7 @@
 	)
 	(symbol
 		(lib_id "Device:C_Small")
-		(at 246.38 60.96 180)
+		(at 237.49 45.72 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7960,7 +8188,7 @@
 		(fields_autoplaced yes)
 		(uuid "27cc57f5-03ef-4f71-841d-a297c926c232")
 		(property "Reference" "C15"
-			(at 248.92 59.6835 0)
+			(at 240.03 44.4435 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7969,7 +8197,7 @@
 			)
 		)
 		(property "Value" "70pF"
-			(at 248.92 62.2235 0)
+			(at 240.03 46.9835 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7978,7 +8206,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
-			(at 246.38 60.96 0)
+			(at 237.49 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7987,7 +8215,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 246.38 60.96 0)
+			(at 237.49 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7996,7 +8224,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
-			(at 246.38 60.96 0)
+			(at 237.49 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8218,71 +8446,6 @@
 			(project "ESPSPE_Scemetic"
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "#PWR033")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 191.77 63.5 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "32b84114-62ed-43ec-bc98-a85eafde8b19")
-		(property "Reference" "#PWR019"
-			(at 191.77 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 191.77 67.818 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 191.77 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 191.77 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 191.77 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "c818286d-beae-4518-bc64-336e8624e34f")
-		)
-		(instances
-			(project "ESPSPE_Scemetic"
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "#PWR019")
 					(unit 1)
 				)
 			)
@@ -9441,6 +9604,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 186.69 62.23 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "657ea1ed-7bfc-47fc-9d53-2765a4deff14")
+		(property "Reference" "#PWR018"
+			(at 186.69 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 186.69 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 186.69 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 186.69 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 186.69 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d57dc375-6d45-4530-a717-3e1ba229e622")
+		)
+		(instances
+			(project ""
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "#PWR018")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 163.83 50.8 180)
 		(unit 1)
@@ -9504,6 +9733,128 @@
 			(project "ESPSPE_Scemetic"
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "UDZUVFHTE-175_6B:UDZUVFHTE-175.6B")
+		(at 191.77 55.88 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6ace8af4-7867-4e3f-83d9-03b5d368c0c0")
+		(property "Reference" "D1"
+			(at 195.58 62.2299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "UDZUVFHTE-175.6B"
+			(at 195.58 64.7699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "KiCad_ZDiode_8pf:UDZUVFHTE1756B"
+			(at 98.12 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/discrete/diode/zener/udzuvfhte-175.6b-e.pdf"
+			(at -1.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "3.3V, UMD2, Automotive Transient Voltage Suppressor (AEC-Q101 Qualified)"
+			(at 191.77 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "0.9"
+			(at -201.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" ""
+			(at -301.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" ""
+			(at -401.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "ROHM Semiconductor"
+			(at -501.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "UDZUVFHTE-175.6B"
+			(at -601.88 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b3fbce4e-598e-4e13-aceb-18052f8158d6")
+		)
+		(pin "2"
+			(uuid "1375b2e1-8d9c-4f83-8f6b-dfc42f4d8b78")
+		)
+		(instances
+			(project "ESPSPE_Scemetic"
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -10404,7 +10755,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 246.38 64.77 0)
+		(at 237.49 49.53 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -10412,7 +10763,7 @@
 		(dnp no)
 		(uuid "7e41d169-4083-43e8-8149-005c558ee95f")
 		(property "Reference" "#PWR029"
-			(at 246.38 71.12 0)
+			(at 237.49 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10421,7 +10772,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 246.38 68.58 0)
+			(at 237.49 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10429,7 +10780,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 246.38 64.77 0)
+			(at 237.49 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10438,7 +10789,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 246.38 64.77 0)
+			(at 237.49 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10447,7 +10798,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 246.38 64.77 0)
+			(at 237.49 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10661,6 +11012,249 @@
 			(project ""
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "R11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "UDZUVFHTE-175_6B:UDZUVFHTE-175.6B")
+		(at 246.38 48.26 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8838f1ab-b96f-4cee-b68d-fa1072147a7b")
+		(property "Reference" "D2"
+			(at 248.92 55.118 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "UDZUVFHTE-175.6B"
+			(at 240.284 67.31 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "KiCad_ZDiode_8pf:UDZUVFHTE1756B"
+			(at 152.73 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/discrete/diode/zener/udzuvfhte-175.6b-e.pdf"
+			(at 52.73 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "3.3V, UMD2, Automotive Transient Voltage Suppressor (AEC-Q101 Qualified)"
+			(at 246.38 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "0.9"
+			(at -147.27 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" ""
+			(at -247.27 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" ""
+			(at -347.27 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "ROHM Semiconductor"
+			(at -447.27 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "UDZUVFHTE-175.6B"
+			(at -547.27 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2bbb0a62-da7a-4b02-996a-7e1a2feaf462")
+		)
+		(pin "2"
+			(uuid "95eccd82-cd85-479b-8788-52c30423515e")
+		)
+		(instances
+			(project "ESPSPE_Scemetic"
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "UDZUVFHTE-175_6B:UDZUVFHTE-175.6B")
+		(at 186.69 45.72 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8e84d714-a10f-4def-9ec5-db632296ac44")
+		(property "Reference" "D7"
+			(at 190.5 52.0699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "UDZUVFHTE-175.6B"
+			(at 190.5 54.6099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "KiCad_ZDiode_8pf:UDZUVFHTE1756B"
+			(at 93.04 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/discrete/diode/zener/udzuvfhte-175.6b-e.pdf"
+			(at -6.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "3.3V, UMD2, Automotive Transient Voltage Suppressor (AEC-Q101 Qualified)"
+			(at 186.69 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "0.9"
+			(at -206.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" ""
+			(at -306.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" ""
+			(at -406.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "ROHM Semiconductor"
+			(at -506.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "UDZUVFHTE-175.6B"
+			(at -606.96 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5e6910d2-0f13-4e0b-b911-4e4b0b4be7d4")
+		)
+		(pin "2"
+			(uuid "b6db2e71-9776-4da4-88c5-be7c63580ae5")
+		)
+		(instances
+			(project ""
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "D7")
 					(unit 1)
 				)
 			)
@@ -12361,6 +12955,70 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 29.21 182.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c5b66a27-c3c1-4718-9af0-335194f9dcea")
+		(property "Reference" "J2"
+			(at 26.67 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 29.21 186.182 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical"
+			(at 29.21 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 29.21 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 29.21 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6510a296-fcd2-432c-bdd9-998cf9591b43")
+		)
+		(instances
+			(project ""
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:PWR_FLAG")
 		(at 24.13 138.43 180)
 		(unit 1)
@@ -12421,76 +13079,6 @@
 			(project ""
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "#FLG01")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:D_Zener")
-		(at 191.77 58.42 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c6be5e3c-c4a8-473c-92bd-ad61018a67cc")
-		(property "Reference" "D2"
-			(at 194.31 57.1499 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "D_Zener"
-			(at 194.31 59.6899 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
-			(at 191.77 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 191.77 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Zener diode"
-			(at 191.77 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8e91e30e-653f-4c06-8a6f-fd8df90f77d7")
-		)
-		(pin "2"
-			(uuid "2817f224-ea58-4419-b2b7-6ec65152b8bc")
-		)
-		(instances
-			(project "ESPSPE_Scemetic"
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "D2")
 					(unit 1)
 				)
 			)
@@ -13591,6 +14179,127 @@
 		)
 	)
 	(symbol
+		(lib_id "UDZUVFHTE-175_6B:UDZUVFHTE-175.6B")
+		(at 246.38 46.99 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f7af509a-bd7b-47cf-8d7f-85cd4ba8ee28")
+		(property "Reference" "D8"
+			(at 247.65 44.196 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "UDZUVFHTE-175.6B"
+			(at 239.014 26.924 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad_ZDiode_8pf:UDZUVFHTE1756B"
+			(at 340.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/discrete/diode/zener/udzuvfhte-175.6b-e.pdf"
+			(at 440.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "3.3V, UMD2, Automotive Transient Voltage Suppressor (AEC-Q101 Qualified)"
+			(at 246.38 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "0.9"
+			(at 640.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" ""
+			(at 740.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" ""
+			(at 840.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "ROHM Semiconductor"
+			(at 940.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "UDZUVFHTE-175.6B"
+			(at 1040.03 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4ae419ef-0436-4fde-9c0f-f4b2299555c8")
+		)
+		(pin "2"
+			(uuid "5ff26c3c-0da4-4b6b-a5e3-055159513e74")
+		)
+		(instances
+			(project "ESPSPE_Scemetic"
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "D8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 156.21 81.28 0)
 		(unit 1)
@@ -13657,82 +14366,16 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 186.69 49.53 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f8dca09c-f250-4e99-99d5-4e5d98bba1b6")
-		(property "Reference" "#PWR018"
-			(at 186.69 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 186.69 53.086 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "48762675-f5e0-48a9-90f7-2ff9dfd75c62")
-		)
-		(instances
-			(project "ESPSPE_Scemetic"
-				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
-					(reference "#PWR018")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Screw_Terminal_01x02")
-		(at 257.81 46.99 0)
+		(at 257.81 48.26 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "fcc24d54-c043-4579-8850-aa2a39fa0ff1")
 		(property "Reference" "J1"
-			(at 260.35 46.9899 0)
+			(at 260.35 48.2599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13741,7 +14384,7 @@
 			)
 		)
 		(property "Value" "Screw_Terminal_01x02"
-			(at 260.35 49.5299 0)
+			(at 260.858 51.054 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13750,7 +14393,7 @@
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-2-2.54_1x02_P2.54mm_Horizontal"
-			(at 257.81 46.99 0)
+			(at 257.81 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13759,7 +14402,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 257.81 46.99 0)
+			(at 257.81 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13768,7 +14411,7 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 257.81 46.99 0)
+			(at 257.81 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13853,6 +14496,72 @@
 			(project "ESPSPE_Scemetic"
 				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
 					(reference "R12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 191.77 72.39 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "fedf9435-8a50-478e-99eb-ed69694c97d9")
+		(property "Reference" "#PWR019"
+			(at 191.77 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 191.77 77.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 191.77 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 191.77 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 191.77 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "38f24fbb-00fb-4692-9a7a-443c890b707c")
+		)
+		(instances
+			(project ""
+				(path "/a7aa0af1-99b4-4491-b08a-049990c2f2ac"
+					(reference "#PWR019")
 					(unit 1)
 				)
 			)
