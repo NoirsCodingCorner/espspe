@@ -1,4 +1,4 @@
-26420740668685393
+26422505016264786
 ADIN1110
 LFCSP-40
 40-LFCSP (Lead Frame Chip Scale Package) 6x6mm body and 0.75 mm Package Height -  ADIN1110 datasheet
@@ -98090,6 +98090,13 @@ Logo WEEE
 0
 0
 0
+TVS_Diode
+TVS_Diode_8240136
+
+
+0
+4
+4
 TerminalBlock
 TerminalBlock_Altech_AK300-2_P5.00mm
 Altech AK300 terminal block, pitch 5.0mm, 45 degree angled, see http://www.mouser.com/ds/2/16/PCBMETRC-24178.pdf
