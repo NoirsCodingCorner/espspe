@@ -4352,7 +4352,7 @@
 	)
 	(text "Benötigen wir hier eine spezielle Bauform / Marke? "
 		(exclude_from_sim no)
-		(at 272.542 68.834 0)
+		(at 232.156 39.878 0)
 		(effects
 			(font
 				(size 1.27 1.27)
