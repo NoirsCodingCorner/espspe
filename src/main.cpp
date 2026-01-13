@@ -2,28 +2,22 @@
 #include <SPI.h>
 
 // ==========================================
-// 1. PIN KONFIGURATION
+// 1. PIN & KONFIGURATION
 // ==========================================
 #define ADIN_CS   5
 #define ADIN_MOSI 23
 #define ADIN_SCK  18
-#define ADIN_MISO 19  
-#define ADIN_INT  32
+#define ADIN_MISO 19
 #define ADIN_RST  4
 
-// 1 MHz: Konservativ & Sicher für Fädeldrähte/Breadboards
 #define SPI_SPEED 1000000 
+const uint32_t ID_ADIN1110 = 0x0283BC91;
 
 SPIClass adinSpi(VSPI);
 
-const uint32_t EXPECTED_ID_1110 = 0x0283BC91;
-const uint32_t EXPECTED_ID_2111 = 0x0283BCA1; // Falls es der große Bruder ist
-
 // ==========================================
-// 2. HELPER (CRC & PARITY)
+// 2. HELPER (CRC)
 // ==========================================
-
-// Berechnet CRC8 (Polynom 0x7) für Generic SPI
 uint8_t calculateCRC8(uint8_t *data, size_t len) {
     uint8_t crc = 0;
     for (size_t i = 0; i < len; i++) {
@@ -36,106 +30,35 @@ uint8_t calculateCRC8(uint8_t *data, size_t len) {
     return crc;
 }
 
-// Zählt gesetzte Bits (für Odd Parity im OA Header)
-int countSetBits(uint32_t n) {
-    int count = 0;
-    while (n > 0) { n &= (n - 1); count++; }
-    return count;
-}
-
-// 32-Bit Transfer (MSB First) für Open Alliance
-uint32_t transfer32(uint32_t data) {
-    uint32_t resp = 0;
-    resp |= (uint32_t)adinSpi.transfer((data >> 24) & 0xFF) << 24;
-    resp |= (uint32_t)adinSpi.transfer((data >> 16) & 0xFF) << 16;
-    resp |= (uint32_t)adinSpi.transfer((data >> 8) & 0xFF) << 8;
-    resp |= (uint32_t)adinSpi.transfer((data >> 0) & 0xFF);
-    return resp;
-}
-
 // ==========================================
-// 3. PRINTING & ANALYSE
+// 3. CORE SPI (Generic w/ CRC) - FIXED
 // ==========================================
 
-void printSectionHeader(int strapLevel) {
-    Serial.println();
-    Serial.println("==========================================================================================");
-    if (strapLevel == LOW) 
-        Serial.println("[RESET] STRAP: LOW (Erwartet: OA Protected ODER Gen CRC)");
-    else                    
-        Serial.println("[RESET] STRAP: HIGH (Erwartet: OA Unprotected ODER Gen No-CRC)");
-    Serial.println("==========================================================================================");
-    Serial.printf(" %-28s | %-12s | %-12s | %-12s | %s\n", "TEST PROTOCOL", "TX CMD", "RX DATA", "RX FOOTER", "RESULT");
-    Serial.println("------------------------------+--------------+--------------+--------------+----------------");
-}
-
-void printRow(const char* protoName, String txStr, uint32_t rxData, uint32_t rxFooter) {
-    String statusStr;
-    bool idMatch = (rxData == EXPECTED_ID_1110) || (rxData == EXPECTED_ID_2111);
-    
-    // Einfache Loopback Erkennung (wenn RX == TX)
-    // Wir vergleichen die oberen 16 Bit, da Generic SPI Daten shiften kann
-    uint32_t txVal = strtoul(txStr.substring(0, 4).c_str(), NULL, 16);
-    bool loopback = ((rxData >> 16) == txVal) || (rxData == txVal);
-
-    if (idMatch) {
-        statusStr = "✅ SUCCESS (ID MATCH)";
-    } else if (rxData == 0x00000000) {
-        statusStr = "💤 SILENCE (0V)";
-    } else if (rxData == 0xFFFFFFFF) {
-        statusStr = "❌ HIGH-Z (Float)";
-    } else if (loopback) {
-        statusStr = "⚠️ LOOPBACK / ECHO";
-    } else {
-        statusStr = "❓ UNKNOWN DATA";
-    }
-
-    // Footer Anzeige (nur wenn vorhanden)
-    char footerHex[16] = "-";
-    if (rxFooter != 0xDEADC0DE) { 
-        sprintf(footerHex, "%08X", rxFooter);
-    }
-
-    Serial.printf(" %-28s | %-12s | %08X     | %-12s | %s\n", 
-                  protoName, txStr.c_str(), rxData, footerHex, statusStr.c_str());
-}
-
-// ==========================================
-// 4. TEST IMPLEMENTIERUNGEN (VALIDIERT)
-// ==========================================
-
-// --- A. GENERIC SPI NO CRC (Command 0x8001) ---
-// Erwartet bei Jumper=1, Strap=1
-void test_Generic_NoCRC() {
-    uint16_t cmd = 0x8001; // R/W=1, Addr=1
-    char txBuf[16]; sprintf(txBuf, "%04X", cmd);
-
-    digitalWrite(ADIN_CS, LOW);
-    adinSpi.transfer16(cmd);
-    adinSpi.transfer(0x00); // Turnaround Byte
-    
-    // Generic liest Daten: Wir lesen 4 Bytes
-    uint32_t rx = 0;
-    rx |= (uint32_t)adinSpi.transfer(0x00) << 24;
-    rx |= (uint32_t)adinSpi.transfer(0x00) << 16;
-    rx |= (uint32_t)adinSpi.transfer(0x00) << 8;
-    rx |= (uint32_t)adinSpi.transfer(0x00);
-    digitalWrite(ADIN_CS, HIGH);
-
-    printRow("Generic (NoCRC) 0x8001", String(txBuf), rx, 0xDEADC0DE);
-}
-
-// --- B. GENERIC SPI WITH CRC (Command 0x8001) ---
-// Erwartet bei Jumper=1, Strap=0
-void test_Generic_WithCRC() {
-    uint16_t cmd = 0x8001;
+void writeSPI(uint16_t addr, uint32_t val) {
+    // Write: MSB (Bit 15) muss 0 sein
+    uint16_t cmd = (addr & 0x1FFF); 
     uint8_t buf[2] = { (uint8_t)(cmd >> 8), (uint8_t)(cmd & 0xFF) };
     uint8_t crc = calculateCRC8(buf, 2);
-    char txBuf[16]; sprintf(txBuf, "%04X:%02X", cmd, crc);
 
     digitalWrite(ADIN_CS, LOW);
     adinSpi.transfer16(cmd);
-    adinSpi.transfer(crc);  // CRC senden
+    adinSpi.transfer(crc);
+    adinSpi.transfer((val >> 24) & 0xFF);
+    adinSpi.transfer((val >> 16) & 0xFF);
+    adinSpi.transfer((val >> 8)  & 0xFF);
+    adinSpi.transfer((val)       & 0xFF);
+    digitalWrite(ADIN_CS, HIGH);
+}
+
+uint32_t readSPI(uint16_t addr) {
+    // Read: MSB (Bit 15) muss 1 sein
+    uint16_t cmd = 0x8000 | (addr & 0x1FFF); 
+    uint8_t buf[2] = { (uint8_t)(cmd >> 8), (uint8_t)(cmd & 0xFF) };
+    uint8_t crc = calculateCRC8(buf, 2);
+
+    digitalWrite(ADIN_CS, LOW);
+    adinSpi.transfer16(cmd);
+    adinSpi.transfer(crc);
     adinSpi.transfer(0x00); // Turnaround
     
     uint32_t rx = 0;
@@ -144,107 +67,192 @@ void test_Generic_WithCRC() {
     rx |= (uint32_t)adinSpi.transfer(0x00) << 8;
     rx |= (uint32_t)adinSpi.transfer(0x00);
     digitalWrite(ADIN_CS, HIGH);
-
-    printRow("Generic (CRC) 0x8001", String(txBuf), rx, 0xDEADC0DE);
-}
-
-// --- C. OPEN ALLIANCE UNPROTECTED ---
-// Erwartet bei Jumper=0, Strap=1
-void test_OA_Unprotected() {
-    // Header Aufbau: DNC(0), HDRB(1), WNR(0), Addr(1) -> Shift 8
-    uint32_t header = (1UL << 30) | (0x01UL << 8);    
-    
-    // Parity Calculation (Odd Parity über 32 Bit)
-    if (countSetBits(header) % 2 == 0) header |= 1UL;
-    
-    char txBuf[16]; sprintf(txBuf, "%08X", header);
-
-    digitalWrite(ADIN_CS, LOW);
-    transfer32(header); 
-    uint32_t rxData = transfer32(0x00000000); // Daten lesen
-    digitalWrite(ADIN_CS, HIGH); // CS sofort hoch -> kein Footer erwartet
-
-    printRow("OA Unprotected", String(txBuf), rxData, 0xDEADC0DE);
-}
-
-// --- D. OPEN ALLIANCE PROTECTED ---
-// Erwartet bei Jumper=0, Strap=0
-void test_OA_Protected() {
-    uint32_t header = (1UL << 30) | (0x01UL << 8);    
-    if (countSetBits(header) % 2 == 0) header |= 1UL;
-    
-    char txBuf[16]; sprintf(txBuf, "%08X", header);
-
-    digitalWrite(ADIN_CS, LOW);
-    transfer32(header); 
-    uint32_t rxData = transfer32(0x00000000); 
-    uint32_t rxFooter = transfer32(0x00000000); // Footer (Status+CRC) lesen!
-    digitalWrite(ADIN_CS, HIGH);
-
-    printRow("OA Protected", String(txBuf), rxData, rxFooter);
+    return rx;
 }
 
 // ==========================================
-// 5. MAIN
+// 4. MDIO BRIDGE (MIT POLLING FIX)
 // ==========================================
 
-void performStrapReset(int strapLevel) {
-    printSectionHeader(strapLevel);
+uint16_t readPhyReg(uint8_t devAddr, uint16_t regAddr) {
+    // 1. Adresse schreiben
+    uint32_t valAddr = (0x0 << 26) | (devAddr << 16) | regAddr; 
+    writeSPI(0x20, valAddr); 
     
-    // 1. Reset drücken
-    digitalWrite(ADIN_RST, LOW); 
-    delay(20);
+    // 2. Read Befehl schreiben
+    uint32_t valRead = (0x3 << 26) | (devAddr << 16);
+    writeSPI(0x20, valRead); 
     
-    // 2. MISO Pin als Ausgang setzen (Soft-Strap)
-    pinMode(ADIN_MISO, OUTPUT); 
-    digitalWrite(ADIN_MISO, strapLevel); 
-    delay(20);
+    // 3. POLLING LOOP: Warten bis TRDONE (Bit 31) gesetzt ist
+    // Dies verhindert, dass wir 0x0000 lesen, wenn der Chip noch beschäftigt ist.
+    for(int i=0; i<200; i++) {
+        uint32_t result = readSPI(0x20); // Status lesen
+        if (result & 0x80000000) {       // Bit 31 gesetzt?
+            return (uint16_t)(result & 0xFFFF); // Daten zurückgeben
+        }
+        delayMicroseconds(10);
+    }
+    return 0xFFFF; // Timeout (Bridge Error)
+}
+
+// ==========================================
+// 5. DECODER FUNKTIONEN (LED & STATUS)
+// ==========================================
+
+void printLEDStatus(uint16_t val) {
+    if (val == 0xFFFF) { Serial.print("READ ERROR"); return; }
     
-    // 3. Reset loslassen
-    digitalWrite(ADIN_RST, HIGH); 
-    delay(50); // Chip liest jetzt den Strap
+    // Formatierung so anpassen, dass es in die Tabelle passt (ggf. zweizeilig denken)
+    Serial.printf("(Raw: 0x%04X) ", val);
     
-    // 4. WICHTIG: MISO sofort wieder auf Input
-    pinMode(ADIN_MISO, INPUT); 
+    bool led0_en = (val >> 7) & 0x1;
+    bool led1_en = (val >> 6) & 0x1;
+    uint8_t led0_mode = (val >> 2) & 0x3; 
+    uint8_t led1_mode = (val >> 4) & 0x3;
+
+    if(!led0_en && !led1_en) {
+        Serial.print("All LEDs Disabled");
+        return;
+    }
+
+    if(led0_en) {
+        Serial.print("L0:");
+        if(led0_mode==0) Serial.print("Lnk/Act ");
+        else if(led0_mode==1) Serial.print("Lnk ");
+        else Serial.print("Act ");
+    }
+    if(led1_en) {
+        Serial.print("| L1:");
+        if(led1_mode==0) Serial.print("Lnk/Act");
+        else if(led1_mode==1) Serial.print("Lnk");
+        else Serial.print("Act");
+    }
+}
+
+// ==========================================
+// 6. VISUALISIERUNG
+// ==========================================
+
+void printTable1Header() {
+    Serial.println("\n--- TEIL 1: MAC REGISTER (SPI DIRECT) ---");
+    Serial.println("+----------------------+--------+------------+------------+---------------------------+");
+    Serial.printf("| %-20s | %-6s | %-10s | %-10s | %-25s |\n", "REGISTER NAME", "ADDR", "TX (CMD)", "RX (HEX)", "INTERPRETATION");
+    Serial.println("+----------------------+--------+------------+------------+---------------------------+");
+}
+
+void printRowMAC(const char* regName, uint8_t addr, uint32_t rxData) {
+    char statusBuf[64];
+    uint16_t txCmd = 0x8000 | (addr & 0x1FFF); 
+
+    if (addr == 0x01) {
+        if (rxData == ID_ADIN1110) strcpy(statusBuf, "✅ ID MATCH");
+        else                       strcpy(statusBuf, "❌ WRONG ID");
+    } else if (addr == 0x08) {
+        if (rxData & 0x80) strcpy(statusBuf, "⚠️ PHY INT");
+        else if (rxData & 0x40) strcpy(statusBuf, "✅ RESET COMPLETE");
+        else strcpy(statusBuf, "Status OK");
+    } else if (addr == 0x00) {
+        // MI_CONTROL Interpretation
+        if (rxData == 0x10) strcpy(statusBuf, "Default (10BASE-T1L)");
+        else sprintf(statusBuf, "Val: %u (Configured)", rxData);
+    } else {
+         sprintf(statusBuf, "Val: %u", rxData);
+    }
     
-    // 5. Warten auf Boot
-    delay(100); 
+    Serial.printf("| %-20s | 0x%02X   | 0x%04X     | 0x%08X | %-25s |\n", regName, addr, txCmd, rxData, statusBuf);
+}
+
+void printTable2Header() {
+    Serial.println("\n--- TEIL 2: PHY REGISTER (VIA MDIO BRIDGE) ---");
+    Serial.println("+------+--------+-----------+--------+------------------------------------------+");
+    Serial.printf("| %-4s | %-6s | %-9s | %-6s | %-40s |\n", "DEV", "REG", "NAME", "VAL", "DETAIL");
+    Serial.println("+------+--------+-----------+--------+------------------------------------------+");
+}
+
+void printRowPHY(uint8_t dev, uint16_t reg, const char* name) {
+    uint16_t val = readPhyReg(dev, reg);
+    
+    Serial.printf("| 0x%02X | 0x%04X | %-9s | 0x%04X | ", dev, reg, name, val);
+    
+    if (val == 0xFFFF) {
+        Serial.println("❌ BRIDGE TIMEOUT / ERROR");
+    } 
+    else if (strcmp(name, "PMA_STAT1") == 0) {
+        if (val & 0x0004) Serial.println("🟢 LINK UP (Verbindung OK)");
+        else              Serial.println("🔴 LINK DOWN (Warte auf Partner...)");
+    }
+    else if (strcmp(name, "MSE_VAL") == 0) {
+        if (val == 0) Serial.println("No Signal / Perfect Silence");
+        else if (val < 0x0600) Serial.printf("✅ Excellent Quality (%d)\n", val);
+        else Serial.printf("⚠️ Poor Quality (%d)\n", val);
+    }
+    else if (strcmp(name, "PHY_STATUS") == 0) {
+        if (val & 0x1000) Serial.println("LINK OK (Vendor Bit)");
+        else              Serial.println("NO LINK");
+    }
+    else if (strcmp(name, "LED_CNTRL") == 0) {
+        printLEDStatus(val);
+        Serial.println();
+    }
+    else if (strcmp(name, "CRSM_IRQ") == 0) {
+        // Interrupt Status Register
+        Serial.printf("Raw: %u\n", val);
+    }
+    else {
+        Serial.println("-");
+    }
+}
+
+// ==========================================
+// 7. SETUP & MAIN
+// ==========================================
+
+void performSafetyReset() {
+    Serial.println("\n[INIT] Safety-Reset (Forcing Generic SPI Mode)...");
+    pinMode(ADIN_MISO, OUTPUT); digitalWrite(ADIN_MISO, LOW); 
+    digitalWrite(ADIN_RST, LOW); delay(20);
+    digitalWrite(ADIN_RST, HIGH); delay(50); 
+    pinMode(ADIN_MISO, INPUT); delay(50);
 }
 
 void setup() {
     Serial.begin(115200);
-    pinMode(ADIN_CS, OUTPUT);
+    while (!Serial) delay(10);
+    Serial.println("\n--- ADIN1110 FULL DIAGNOSTIC ---");
+    Serial.println("Druecke ENTER zum Starten...");
+    while (Serial.available() == 0) delay(100);
+    while (Serial.available()) Serial.read();
+
+    pinMode(ADIN_CS, OUTPUT); digitalWrite(ADIN_CS, HIGH);
     pinMode(ADIN_RST, OUTPUT);
-    digitalWrite(ADIN_CS, HIGH);
     
     adinSpi.begin(ADIN_SCK, ADIN_MISO, ADIN_MOSI, ADIN_CS);
-    
-    while(!Serial) delay(10);
-    Serial.println("\n\n--- ADIN1110 FORENSIC SCAN (VALIDATED) ---");
-    Serial.println("Druecken Sie ENTER zum Starten...");
-    while(Serial.available() == 0) delay(100);
-    while(Serial.available()) Serial.read();
+    performSafetyReset();
 }
 
 void loop() {
-    int straps[] = {LOW, HIGH};
+    adinSpi.beginTransaction(SPISettings(SPI_SPEED, MSBFIRST, SPI_MODE0));
 
-    for(int s=0; s<2; s++) {
-        performStrapReset(straps[s]);
-        
-        adinSpi.beginTransaction(SPISettings(SPI_SPEED, MSBFIRST, SPI_MODE0));
-        
-        test_Generic_NoCRC();   delay(50);
-        test_Generic_WithCRC(); delay(50);
-        test_OA_Unprotected();  delay(50);
-        test_OA_Protected();    delay(50);
-        
-        adinSpi.endTransaction();
-        
-        Serial.println("... Wartezeit ...");
-        delay(1000);
-    }
-
-    Serial.println("\n--- Zyklus fertig. Neustart in 5s ---\n");
-    delay(5000);
+    // --- TEIL 1: MAC EBENE ---
+    printTable1Header();
+    printRowMAC("Identification", 0x01, readSPI(0x01)); // Chip ID
+    printRowMAC("MI_CONTROL",     0x00, readSPI(0x00)); // Reset State
+    printRowMAC("STATUS_0",       0x08, readSPI(0x08)); // Interrupts / Boot Status
+    printRowMAC("IRQ_MASK",       0x0C, readSPI(0x0C)); // Interrupt Maske
+    
+    // --- TEIL 2: PHY EBENE ---
+    printTable2Header();
+    // Standard IEEE Register
+    printRowPHY(0x01, 0x0001, "PMA_STAT1");  // Link Status (Std)
+    printRowPHY(0x01, 0x830B, "MSE_VAL");    // Signal Quality
+    printRowPHY(0x01, 0x08F7, "PHY_STATUS"); // Link Status (Vendor)
+    
+    // Vendor Specific Register
+    printRowPHY(0x1E, 0x8C82, "LED_CNTRL");  // LED Config
+    printRowPHY(0x1E, 0x0010, "CRSM_IRQ");   // Internal Events
+    
+    adinSpi.endTransaction();
+    
+    Serial.println("\n... Scan erneut in 3 Sekunden ...");
+    delay(3000);
 }
