@@ -2,183 +2,249 @@
 #include <SPI.h>
 
 // ==========================================
-// PIN DEFINITIONEN
+// 1. PIN KONFIGURATION
 // ==========================================
 #define ADIN_CS   5
 #define ADIN_MOSI 23
 #define ADIN_SCK  18
-#define ADIN_MISO 19  // Wird auch als Strap-Pin missbraucht!
+#define ADIN_MISO 19  
 #define ADIN_INT  32
 #define ADIN_RST  4
 
-#define SPI_SPEED 1000000 // 1 MHz - sicher und sauber
+// 1 MHz: Konservativ & Sicher für Fädeldrähte/Breadboards
+#define SPI_SPEED 1000000 
 
 SPIClass adinSpi(VSPI);
 
+const uint32_t EXPECTED_ID_1110 = 0x0283BC91;
+const uint32_t EXPECTED_ID_2111 = 0x0283BCA1; // Falls es der große Bruder ist
+
 // ==========================================
-// HILFSFUNKTIONEN
+// 2. HELPER (CRC & PARITY)
 // ==========================================
 
-// Parität berechnen (für Open Alliance)
+// Berechnet CRC8 (Polynom 0x7) für Generic SPI
+uint8_t calculateCRC8(uint8_t *data, size_t len) {
+    uint8_t crc = 0;
+    for (size_t i = 0; i < len; i++) {
+        crc ^= data[i];
+        for (int j = 0; j < 8; j++) {
+            if (crc & 0x80) crc = (crc << 1) ^ 0x07;
+            else crc <<= 1;
+        }
+    }
+    return crc;
+}
+
+// Zählt gesetzte Bits (für Odd Parity im OA Header)
 int countSetBits(uint32_t n) {
-  int count = 0;
-  while (n > 0) { n &= (n - 1); count++; }
-  return count;
+    int count = 0;
+    while (n > 0) { n &= (n - 1); count++; }
+    return count;
 }
 
-// 32-Bit Transfer (für Open Alliance)
+// 32-Bit Transfer (MSB First) für Open Alliance
 uint32_t transfer32(uint32_t data) {
-  uint32_t resp = 0;
-  resp |= (uint32_t)adinSpi.transfer((data >> 24) & 0xFF) << 24;
-  resp |= (uint32_t)adinSpi.transfer((data >> 16) & 0xFF) << 16;
-  resp |= (uint32_t)adinSpi.transfer((data >> 8) & 0xFF) << 8;
-  resp |= (uint32_t)adinSpi.transfer((data >> 0) & 0xFF);
-  return resp;
+    uint32_t resp = 0;
+    resp |= (uint32_t)adinSpi.transfer((data >> 24) & 0xFF) << 24;
+    resp |= (uint32_t)adinSpi.transfer((data >> 16) & 0xFF) << 16;
+    resp |= (uint32_t)adinSpi.transfer((data >> 8) & 0xFF) << 8;
+    resp |= (uint32_t)adinSpi.transfer((data >> 0) & 0xFF);
+    return resp;
 }
 
-// RESET MIT SOFT-STRAP
-// Zwingt MISO während des Resets auf HIGH oder LOW
+// ==========================================
+// 3. PRINTING & ANALYSE
+// ==========================================
+
+void printSectionHeader(int strapLevel) {
+    Serial.println();
+    Serial.println("==========================================================================================");
+    if (strapLevel == LOW) 
+        Serial.println("[RESET] STRAP: LOW (Erwartet: OA Protected ODER Gen CRC)");
+    else                    
+        Serial.println("[RESET] STRAP: HIGH (Erwartet: OA Unprotected ODER Gen No-CRC)");
+    Serial.println("==========================================================================================");
+    Serial.printf(" %-28s | %-12s | %-12s | %-12s | %s\n", "TEST PROTOCOL", "TX CMD", "RX DATA", "RX FOOTER", "RESULT");
+    Serial.println("------------------------------+--------------+--------------+--------------+----------------");
+}
+
+void printRow(const char* protoName, String txStr, uint32_t rxData, uint32_t rxFooter) {
+    String statusStr;
+    bool idMatch = (rxData == EXPECTED_ID_1110) || (rxData == EXPECTED_ID_2111);
+    
+    // Einfache Loopback Erkennung (wenn RX == TX)
+    // Wir vergleichen die oberen 16 Bit, da Generic SPI Daten shiften kann
+    uint32_t txVal = strtoul(txStr.substring(0, 4).c_str(), NULL, 16);
+    bool loopback = ((rxData >> 16) == txVal) || (rxData == txVal);
+
+    if (idMatch) {
+        statusStr = "✅ SUCCESS (ID MATCH)";
+    } else if (rxData == 0x00000000) {
+        statusStr = "💤 SILENCE (0V)";
+    } else if (rxData == 0xFFFFFFFF) {
+        statusStr = "❌ HIGH-Z (Float)";
+    } else if (loopback) {
+        statusStr = "⚠️ LOOPBACK / ECHO";
+    } else {
+        statusStr = "❓ UNKNOWN DATA";
+    }
+
+    // Footer Anzeige (nur wenn vorhanden)
+    char footerHex[16] = "-";
+    if (rxFooter != 0xDEADC0DE) { 
+        sprintf(footerHex, "%08X", rxFooter);
+    }
+
+    Serial.printf(" %-28s | %-12s | %08X     | %-12s | %s\n", 
+                  protoName, txStr.c_str(), rxData, footerHex, statusStr.c_str());
+}
+
+// ==========================================
+// 4. TEST IMPLEMENTIERUNGEN (VALIDIERT)
+// ==========================================
+
+// --- A. GENERIC SPI NO CRC (Command 0x8001) ---
+// Erwartet bei Jumper=1, Strap=1
+void test_Generic_NoCRC() {
+    uint16_t cmd = 0x8001; // R/W=1, Addr=1
+    char txBuf[16]; sprintf(txBuf, "%04X", cmd);
+
+    digitalWrite(ADIN_CS, LOW);
+    adinSpi.transfer16(cmd);
+    adinSpi.transfer(0x00); // Turnaround Byte
+    
+    // Generic liest Daten: Wir lesen 4 Bytes
+    uint32_t rx = 0;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 24;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 16;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 8;
+    rx |= (uint32_t)adinSpi.transfer(0x00);
+    digitalWrite(ADIN_CS, HIGH);
+
+    printRow("Generic (NoCRC) 0x8001", String(txBuf), rx, 0xDEADC0DE);
+}
+
+// --- B. GENERIC SPI WITH CRC (Command 0x8001) ---
+// Erwartet bei Jumper=1, Strap=0
+void test_Generic_WithCRC() {
+    uint16_t cmd = 0x8001;
+    uint8_t buf[2] = { (uint8_t)(cmd >> 8), (uint8_t)(cmd & 0xFF) };
+    uint8_t crc = calculateCRC8(buf, 2);
+    char txBuf[16]; sprintf(txBuf, "%04X:%02X", cmd, crc);
+
+    digitalWrite(ADIN_CS, LOW);
+    adinSpi.transfer16(cmd);
+    adinSpi.transfer(crc);  // CRC senden
+    adinSpi.transfer(0x00); // Turnaround
+    
+    uint32_t rx = 0;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 24;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 16;
+    rx |= (uint32_t)adinSpi.transfer(0x00) << 8;
+    rx |= (uint32_t)adinSpi.transfer(0x00);
+    digitalWrite(ADIN_CS, HIGH);
+
+    printRow("Generic (CRC) 0x8001", String(txBuf), rx, 0xDEADC0DE);
+}
+
+// --- C. OPEN ALLIANCE UNPROTECTED ---
+// Erwartet bei Jumper=0, Strap=1
+void test_OA_Unprotected() {
+    // Header Aufbau: DNC(0), HDRB(1), WNR(0), Addr(1) -> Shift 8
+    uint32_t header = (1UL << 30) | (0x01UL << 8);    
+    
+    // Parity Calculation (Odd Parity über 32 Bit)
+    if (countSetBits(header) % 2 == 0) header |= 1UL;
+    
+    char txBuf[16]; sprintf(txBuf, "%08X", header);
+
+    digitalWrite(ADIN_CS, LOW);
+    transfer32(header); 
+    uint32_t rxData = transfer32(0x00000000); // Daten lesen
+    digitalWrite(ADIN_CS, HIGH); // CS sofort hoch -> kein Footer erwartet
+
+    printRow("OA Unprotected", String(txBuf), rxData, 0xDEADC0DE);
+}
+
+// --- D. OPEN ALLIANCE PROTECTED ---
+// Erwartet bei Jumper=0, Strap=0
+void test_OA_Protected() {
+    uint32_t header = (1UL << 30) | (0x01UL << 8);    
+    if (countSetBits(header) % 2 == 0) header |= 1UL;
+    
+    char txBuf[16]; sprintf(txBuf, "%08X", header);
+
+    digitalWrite(ADIN_CS, LOW);
+    transfer32(header); 
+    uint32_t rxData = transfer32(0x00000000); 
+    uint32_t rxFooter = transfer32(0x00000000); // Footer (Status+CRC) lesen!
+    digitalWrite(ADIN_CS, HIGH);
+
+    printRow("OA Protected", String(txBuf), rxData, rxFooter);
+}
+
+// ==========================================
+// 5. MAIN
+// ==========================================
+
 void performStrapReset(int strapLevel) {
-  Serial.println("\n------------------------------------------------");
-  Serial.print("[RESET] Zwinge MISO (CFG0) auf: ");
-  Serial.println(strapLevel == LOW ? "LOW (GND)" : "HIGH (3.3V)");
-  
-  // 1. Reset aktivieren
-  digitalWrite(ADIN_RST, LOW);
-  delay(50);
-  
-  // 2. MISO Pin als Ausgang konfigurieren und Pegel setzen
-  pinMode(ADIN_MISO, OUTPUT);
-  digitalWrite(ADIN_MISO, strapLevel);
-  
-  // 3. Reset loslassen (Chip liest jetzt den Pegel)
-  delay(10);
-  digitalWrite(ADIN_RST, HIGH);
-  
-  // 4. Pegel kurz halten, bis Chip sicher gebootet hat
-  delay(20);
-  
-  // 5. MISO wieder als SPI-Eingang freigeben
-  pinMode(ADIN_MISO, INPUT);
-  
-  Serial.println("[RESET] Fertig. Warte auf PLL Lock...");
-  delay(150); // Chip Zeit geben zum Aufwachen
+    printSectionHeader(strapLevel);
+    
+    // 1. Reset drücken
+    digitalWrite(ADIN_RST, LOW); 
+    delay(20);
+    
+    // 2. MISO Pin als Ausgang setzen (Soft-Strap)
+    pinMode(ADIN_MISO, OUTPUT); 
+    digitalWrite(ADIN_MISO, strapLevel); 
+    delay(20);
+    
+    // 3. Reset loslassen
+    digitalWrite(ADIN_RST, HIGH); 
+    delay(50); // Chip liest jetzt den Strap
+    
+    // 4. WICHTIG: MISO sofort wieder auf Input
+    pinMode(ADIN_MISO, INPUT); 
+    
+    // 5. Warten auf Boot
+    delay(100); 
 }
-
-// TEST 1: OPEN ALLIANCE PROTOKOLL
-void tryOpenAlliance() {
-  // Befehl: Read Register 0x01 (PHY ID)
-  // Header: Control(0), HDRB(1), Read(0), Addr(1)
-  uint32_t cmd = 0;
-  cmd |= (1UL << 30);      // HDRB
-  cmd |= (0x01 << 8);      // Adresse
-  if (countSetBits(cmd) % 2 == 0) cmd |= 1UL; // Odd Parity
-
-  adinSpi.beginTransaction(SPISettings(SPI_SPEED, MSBFIRST, SPI_MODE0));
-  digitalWrite(ADIN_CS, LOW);
-  
-  uint32_t rxHeader = transfer32(cmd);      // Sende Befehl
-  uint32_t rxData   = transfer32(0x00000000); // Lese Daten
-  
-  digitalWrite(ADIN_CS, HIGH);
-  adinSpi.endTransaction();
-
-  Serial.print("   [OA-Proto]  TX: 0x"); Serial.print(cmd, HEX);
-  Serial.print(" | RX: 0x"); Serial.print(rxData, HEX);
-  
-  if (rxData == 0x0283BC91) Serial.println(" -> SUCCESS! (ID OK)");
-  else if (rxData == 0) Serial.println(" -> (0V / Low)");
-  else Serial.println(" -> (Daten empfangen!)");
-}
-
-// TEST 2: GENERIC SPI PROTOKOLL
-void tryGenericSPI() {
-  // Befehl: Read Register 0x01
-  // Header: Control(1), AutoInc(1), Read(0), Addr(0x1) -> 0xA001
-  uint16_t cmd = 0xA001;
-
-  adinSpi.beginTransaction(SPISettings(SPI_SPEED, MSBFIRST, SPI_MODE0));
-  digitalWrite(ADIN_CS, LOW);
-  
-  adinSpi.transfer16(cmd); // 16 Bit Header
-  adinSpi.transfer(0x00);  // 8 Bit Turnaround
-  
-  // Wir lesen 32 Bit Daten (auch wenn Generic oft nur 16 sendet, wir lesen sicherheitshalber mehr)
-  uint32_t rxData = 0;
-  rxData |= (uint32_t)adinSpi.transfer(0x00) << 24;
-  rxData |= (uint32_t)adinSpi.transfer(0x00) << 16;
-  rxData |= (uint32_t)adinSpi.transfer(0x00) << 8;
-  rxData |= (uint32_t)adinSpi.transfer(0x00);
-  
-  digitalWrite(ADIN_CS, HIGH);
-  adinSpi.endTransaction();
-
-  Serial.print("   [GEN-Proto] TX: 0xA001     | RX: 0x"); Serial.print(rxData, HEX);
-  
-  // Generic SPI sendet ID oft Byte-weise gedreht oder verschoben, 
-  // wir achten einfach drauf, ob es NICHT 0 ist.
-  if (rxData == 0x0283BC91) Serial.println(" -> SUCCESS! (ID OK)");
-  else if (rxData == 0) Serial.println(" -> (0V / Low)");
-  else Serial.println(" -> (Daten empfangen!)");
-}
-
-// ==========================================
-// MAIN SETUP & LOOP
-// ==========================================
 
 void setup() {
-  Serial.begin(115200);
-  
-  pinMode(ADIN_CS, OUTPUT);
-  pinMode(ADIN_RST, OUTPUT);
-  pinMode(ADIN_INT, INPUT_PULLUP);
-  digitalWrite(ADIN_CS, HIGH);
-
-  adinSpi.begin(ADIN_SCK, ADIN_MISO, ADIN_MOSI, ADIN_CS);
-
-  while(!Serial) delay(10);
-  Serial.println("\n\n################################################");
-  Serial.println("   ADIN1110 PROTOCOL BRUTE FORCER");
-  Serial.println("   Testet alle 4 SPI-Modi zyklisch durch.");
-  Serial.println("################################################");
-  delay(1000);
+    Serial.begin(115200);
+    pinMode(ADIN_CS, OUTPUT);
+    pinMode(ADIN_RST, OUTPUT);
+    digitalWrite(ADIN_CS, HIGH);
+    
+    adinSpi.begin(ADIN_SCK, ADIN_MISO, ADIN_MOSI, ADIN_CS);
+    
+    while(!Serial) delay(10);
+    Serial.println("\n\n--- ADIN1110 FORENSIC SCAN (VALIDATED) ---");
+    Serial.println("Druecken Sie ENTER zum Starten...");
+    while(Serial.available() == 0) delay(100);
+    while(Serial.available()) Serial.read();
 }
 
 void loop() {
-  // ============================================================
-  // PHASE A: MISO (CFG0) auf LOW zwingen
-  // ============================================================
-  // Wenn Jumper CFG1 = LOW  -> Modus (0,0) = Open Alliance Protected
-  // Wenn Jumper CFG1 = HIGH -> Modus (1,0) = Generic SPI with CRC
-  
-  performStrapReset(LOW); 
-  
-  Serial.println(">>> Teste Kommunikation (Strap=LOW)...");
-  for(int i=0; i<3; i++) { // Wir probieren es 3x
-     tryOpenAlliance();
-     delay(10);
-     tryGenericSPI();
-     delay(100);
-  }
+    int straps[] = {LOW, HIGH};
 
-  delay(1000); // Kurze Pause zum Lesen
+    for(int s=0; s<2; s++) {
+        performStrapReset(straps[s]);
+        
+        adinSpi.beginTransaction(SPISettings(SPI_SPEED, MSBFIRST, SPI_MODE0));
+        
+        test_Generic_NoCRC();   delay(50);
+        test_Generic_WithCRC(); delay(50);
+        test_OA_Unprotected();  delay(50);
+        test_OA_Protected();    delay(50);
+        
+        adinSpi.endTransaction();
+        
+        Serial.println("... Wartezeit ...");
+        delay(1000);
+    }
 
-  // ============================================================
-  // PHASE B: MISO (CFG0) auf HIGH zwingen
-  // ============================================================
-  // Wenn Jumper CFG1 = LOW  -> Modus (0,1) = Open Alliance Unprotected
-  // Wenn Jumper CFG1 = HIGH -> Modus (1,1) = Generic SPI without CRC
-  
-  performStrapReset(HIGH);
-  
-  Serial.println(">>> Teste Kommunikation (Strap=HIGH)...");
-  for(int i=0; i<3; i++) { // Wir probieren es 3x
-     tryOpenAlliance();
-     delay(10);
-     tryGenericSPI();
-     delay(100);
-  }
-
-  Serial.println("\n... Zyklus Ende. Warte 2 Sekunden ...");
-  delay(2000);
+    Serial.println("\n--- Zyklus fertig. Neustart in 5s ---\n");
+    delay(5000);
 }
