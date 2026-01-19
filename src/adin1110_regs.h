@@ -191,3 +191,5 @@
 #define ADIN_MAC_P1_ADDR_SLOT			2
 #define ADIN_MAC_P2_ADDR_SLOT			3
 #define ADIN_MAC_FDB_ADDR_SLOT			4
+
+#endif  _ADIN1110_REGS_H
