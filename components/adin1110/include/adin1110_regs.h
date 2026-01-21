@@ -31,6 +31,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
+#pragma once
 #ifndef _ADIN1110_REGS_H
 #define _ADIN1110_REGS_H
 
@@ -192,4 +193,4 @@
 #define ADIN_MAC_P2_ADDR_SLOT			3
 #define ADIN_MAC_FDB_ADDR_SLOT			4
 
-#endif  _ADIN1110_REGS_H
+#endif // _ADIN1110_REGS_H
