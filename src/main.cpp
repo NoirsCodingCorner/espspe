@@ -1,4 +1,4 @@
-#include <Arduino.h>
+/*#include <Arduino.h>
 #include <SPI.h>
 #include <esp_mac.h>
 #include "adin1110_regs.h"
@@ -291,4 +291,4 @@ void setup() {
 void loop() {
     if (DEVICE_ROLE == 1) runSender();
     else runReceiver();
-}
+}*/
