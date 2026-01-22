@@ -1,14 +1,17 @@
-#include "adin1110_regs.h"
 #include "driver/spi_master.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include <string.h>
+#include "adin1110_regs.h" 
 
-// Globaler Context für SPI (vereinfacht für Single-Instance)
-static spi_device_handle_t s_spi_handle;
-static SemaphoreHandle_t s_spi_lock;
+static const char *TAG = "ADIN_SPI";
+static spi_device_handle_t spi_handle;
+static SemaphoreHandle_t spi_mutex = NULL; // Globaler Mutex
 
-// Dein CRC Algorithmus (Portiert auf C)
-static uint8_t calc_crc(const uint8_t *data, size_t len) {
+// --- CRC BERECHNUNG ---
+static uint8_t calculate_crc(const uint8_t *data, size_t len) {
     uint8_t crc = 0;
     for (size_t i = 0; i < len; i++) {
         crc ^= data[i];
@@ -19,114 +22,168 @@ static uint8_t calc_crc(const uint8_t *data, size_t len) {
     return crc;
 }
 
-// SPI Init Helper
 esp_err_t adin_spi_init(spi_host_device_t host, int cs_pin, int freq) {
-    s_spi_lock = xSemaphoreCreateMutex();
+    esp_err_t ret;
+    
+    if (spi_mutex == NULL) {
+        spi_mutex = xSemaphoreCreateMutex();
+        if (!spi_mutex) return ESP_ERR_NO_MEM;
+    }
+
     spi_device_interface_config_t devcfg = {
         .clock_speed_hz = freq,
         .mode = 0,
         .spics_io_num = cs_pin,
-        .queue_size = 10,
+        .queue_size = 1,
+        .flags = 0,
     };
-    return spi_bus_add_device(host, &devcfg, &s_spi_handle);
+
+    ret = spi_bus_add_device(host, &devcfg, &spi_handle);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to add SPI device");
+        return ret;
+    }
+    ESP_LOGI(TAG, "SPI Initialized (Mode 0, %d Hz, CS=%d) with Mutex", freq, cs_pin);
+    return ESP_OK;
 }
 
+// --- REGISTER READ (Generic SPI with 8-bit CRC + Turnaround) ---
 uint32_t adin_read_reg(uint16_t reg) {
-    uint8_t tx[4] = {0}; // Header(2) + CRC(1) + Turnaround(1)
-    uint16_t cmd = 0x8000 | (reg & 0x1FFF); // Generic SPI Read
-    tx[0] = (cmd >> 8); 
-    tx[1] = (cmd & 0xFF);
-    tx[2] = calc_crc(tx, 2);
-    tx[3] = 0x00; // Turnaround
-
-    uint8_t rx[8] = {0}; // Empfangspuffer
+    uint32_t val = 0;
     
-    spi_transaction_t t = {
-        .length = 8 * 8, // 4 Byte Header/TA + 4 Byte Data
-        .tx_buffer = tx,
-        .rx_buffer = rx
-    };
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-    xSemaphoreTake(s_spi_lock, portMAX_DELAY);
-    spi_device_transmit(s_spi_handle, &t);
-    xSemaphoreGive(s_spi_lock);
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t));
 
-    // Daten stehen ab Byte 4 (Big Endian)
-    return (rx[4] << 24) | (rx[5] << 16) | (rx[6] << 8) | rx[7];
+    // Frame: [H1, H2, H_CRC, TA, D1, D2, D3, D4, D_CRC] = 9 Bytes
+    uint8_t tx_buf[9] = {0};
+    uint8_t rx_buf[9] = {0};
+
+    uint16_t cmd = 0x8000 | (reg & 0x1FFF);
+    tx_buf[0] = (cmd >> 8) & 0xFF;
+    tx_buf[1] = cmd & 0xFF;
+    tx_buf[2] = calculate_crc(tx_buf, 2);
+    tx_buf[3] = 0x00; // Turnaround (Hi-Z)
+
+    t.length = 9 * 8;
+    t.tx_buffer = tx_buf;
+    t.rx_buffer = rx_buf;
+
+    if (spi_device_transmit(spi_handle, &t) == ESP_OK) {
+        val = ((uint32_t)rx_buf[4] << 24) |
+              ((uint32_t)rx_buf[5] << 16) |
+              ((uint32_t)rx_buf[6] << 8)  |
+              (uint32_t)rx_buf[7];
+    }
+
+    xSemaphoreGive(spi_mutex);
+    return val;
 }
 
+// --- REGISTER WRITE ---
 void adin_write_reg(uint16_t reg, uint32_t val) {
-    uint8_t buf[8];
-    uint16_t cmd = 0xA000 | (reg & 0x1FFF); // Generic SPI Write
-    buf[0] = cmd >> 8; buf[1] = cmd & 0xFF;
-    buf[2] = calc_crc(buf, 2);
-    buf[3] = val >> 24; buf[4] = val >> 16; buf[5] = val >> 8; buf[6] = val & 0xFF;
-    buf[7] = calc_crc(&buf[3], 4);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-    spi_transaction_t t = { .length = 64, .tx_buffer = buf };
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t));
+
+    uint8_t tx_buf[8] = {0};
+
+    uint16_t cmd = 0xA000 | (reg & 0x1FFF);
+    tx_buf[0] = (cmd >> 8) & 0xFF;
+    tx_buf[1] = cmd & 0xFF;
+    tx_buf[2] = calculate_crc(tx_buf, 2);
+
+    tx_buf[3] = (val >> 24) & 0xFF;
+    tx_buf[4] = (val >> 16) & 0xFF;
+    tx_buf[5] = (val >> 8)  & 0xFF;
+    tx_buf[6] = val & 0xFF;
+    tx_buf[7] = calculate_crc(&tx_buf[3], 4); 
+
+    t.length = 8 * 8;
+    t.tx_buffer = tx_buf;
+
+    spi_device_transmit(spi_handle, &t);
     
-    xSemaphoreTake(s_spi_lock, portMAX_DELAY);
-    spi_device_transmit(s_spi_handle, &t);
-    xSemaphoreGive(s_spi_lock);
+    xSemaphoreGive(spi_mutex);
 }
 
-// Burst Write für Frame Data (KEIN CRC auf Payload!)
+// --- FIFO WRITE (Burst + Bus Locking) ---
 void adin_write_fifo(const uint8_t *data, uint32_t len) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+    spi_device_acquire_bus(spi_handle, portMAX_DELAY);
+
+    // 1. Header
     uint16_t cmd = 0xA000 | (ADIN1110_TX_REG & 0x1FFF);
-    uint8_t header[2] = {cmd >> 8, cmd & 0xFF};
-    uint8_t crc = calc_crc(header, 2);
+    uint8_t header[3];
+    header[0] = (cmd >> 8) & 0xFF;
+    header[1] = cmd & 0xFF;
+    header[2] = calculate_crc(header, 2);
 
-    // Wir müssen Header und Daten in einer Transaktion senden (CS active low)
-    // Wir nutzen hier polling für Einfachheit bei < 64 Bytes, sonst DMA
-    spi_transaction_t t = {0};
-    
-    // Für ESP-IDF ist es am besten, einen temporären Buffer zu nutzen, 
-    // um Header + Data zusammenzuhängen, oder `flags = SPI_TRANS_USE_TXDATA` bei kurzen Paketen.
-    // Hier allokieren wir temporär (Performance-Optimierung wäre statischer Buffer).
-    uint8_t *send_buf = heap_caps_malloc(len + 3 + 1, MALLOC_CAP_DMA); // +3 Header/CRC, +1 Padding
-    
-    send_buf[0] = header[0];
-    send_buf[1] = header[1];
-    send_buf[2] = crc;
-    memcpy(&send_buf[3], data, len);
-    
-    // Padding auf 4 Bytes (optional aber empfohlen beim ADIN)
-    uint32_t total_len = len + 3;
-    if (total_len % 4 != 0) total_len += (4 - (total_len % 4));
+    spi_transaction_t t_head;
+    memset(&t_head, 0, sizeof(t_head));
+    t_head.length = 3 * 8;
+    t_head.tx_buffer = header;
+    t_head.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+    spi_device_transmit(spi_handle, &t_head);
 
-    t.length = total_len * 8;
-    t.tx_buffer = send_buf;
+    // 2. Data
+    spi_transaction_t t_data;
+    memset(&t_data, 0, sizeof(t_data));
+    t_data.length = len * 8;
+    t_data.tx_buffer = data;
+    t_data.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+    spi_device_transmit(spi_handle, &t_data);
 
-    xSemaphoreTake(s_spi_lock, portMAX_DELAY);
-    spi_device_transmit(s_spi_handle, &t);
-    xSemaphoreGive(s_spi_lock);
-    
-    heap_caps_free(send_buf);
+    // 3. Footer
+    uint8_t crc = 0x00; 
+    spi_transaction_t t_crc;
+    memset(&t_crc, 0, sizeof(t_crc));
+    t_crc.length = 8;
+    t_crc.tx_buffer = &crc;
+    spi_device_transmit(spi_handle, &t_crc);
+
+    spi_device_release_bus(spi_handle);
+    xSemaphoreGive(spi_mutex);
 }
 
-// Burst Read FIFO
+// --- FIFO READ (Burst + Bus Locking) ---
 void adin_read_fifo(uint8_t *dest, uint32_t len) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+    spi_device_acquire_bus(spi_handle, portMAX_DELAY);
+
+    // 1. Header
     uint16_t cmd = 0x8000 | (ADIN1110_RX_REG & 0x1FFF);
-    uint8_t head[3] = {cmd >> 8, cmd & 0xFF, 0};
-    head[2] = calc_crc(head, 2); 
-    
-    // Transaktion: Header(2)+CRC(1)+TA(1) senden, dann Daten lesen
-    // Wir machen Full-Duplex: Sende CMD, empfange Müll. Sende Müll, empfange Daten.
-    size_t total = 4 + len; // 4 Byte Overhead
-    uint8_t *tx = heap_caps_calloc(1, total, MALLOC_CAP_DMA);
-    uint8_t *rx = heap_caps_malloc(total, MALLOC_CAP_DMA);
-    
-    memcpy(tx, head, 3);
-    // tx[3] ist Turnaround (0)
-    
-    spi_transaction_t t = { .length = total * 8, .tx_buffer = tx, .rx_buffer = rx };
-    
-    xSemaphoreTake(s_spi_lock, portMAX_DELAY);
-    spi_device_transmit(s_spi_handle, &t);
-    xSemaphoreGive(s_spi_lock);
-    
-    memcpy(dest, &rx[4], len); // Daten ab Byte 4
-    
-    heap_caps_free(tx);
-    heap_caps_free(rx);
+    uint8_t header[4]; 
+    header[0] = (cmd >> 8) & 0xFF;
+    header[1] = cmd & 0xFF;
+    header[2] = calculate_crc(header, 2);
+    header[3] = 0x00;
+
+    spi_transaction_t t_head;
+    memset(&t_head, 0, sizeof(t_head));
+    t_head.length = 4 * 8;
+    t_head.tx_buffer = header;
+    t_head.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+    spi_device_transmit(spi_handle, &t_head);
+
+    // 2. Data
+    spi_transaction_t t_data;
+    memset(&t_data, 0, sizeof(t_data));
+    t_data.length = len * 8;
+    t_data.rx_buffer = dest;
+    t_data.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+    spi_device_transmit(spi_handle, &t_data);
+
+    // 3. Footer
+    uint8_t recv_crc;
+    spi_transaction_t t_crc;
+    memset(&t_crc, 0, sizeof(t_crc));
+    t_crc.length = 8;
+    t_crc.rx_buffer = &recv_crc;
+    spi_device_transmit(spi_handle, &t_crc);
+
+    spi_device_release_bus(spi_handle);
+    xSemaphoreGive(spi_mutex);
 }
