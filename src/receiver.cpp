@@ -6,7 +6,6 @@
 // ==========================================
 // CONFIG
 // ==========================================
-// ADIN1110 SPI PINS (Do not use for LED)
 #define PIN_SCLK 18
 #define PIN_MISO 19
 #define PIN_MOSI 23
@@ -14,29 +13,34 @@
 #define PIN_RST  4
 #define PIN_INT  32
 
-// ⚠️ USER CHOICE:
-// Pin 34 is INPUT ONLY on this board. Do not use.
-// Pin 2 is usually the onboard Blue LED.
-// If you attach an external LED, use Pin 2, 4, 12, 13, 14, 25, 26, 27, 32, 33.
-#define PIN_LED  2  
-#define LED_ON   HIGH
-#define LED_OFF  LOW
+// PWM SETTINGS (Dimming)
+#define PIN_LED      2   
+#define PWM_CHANNEL  0
+#define PWM_FREQ     5000
+#define PWM_RES      8   // 8-bit resolution (0-255)
 
 SPIClass adinSpi(VSPI);
 uint32_t currentSpiFreq = 1000000;
 
-// Global Buffers
 uint8_t ioBuffer[2048] __attribute__ ((aligned (4)));
 uint8_t MY_MAC[6];
 
 // ==========================================
-// SEQUENCER STATE
+// ANIMATION ENGINE STATE
 // ==========================================
-#define MAX_SEQ_STEPS 32
-int  seqDurations[MAX_SEQ_STEPS]; 
-int  seqLength = 0;               
-int  seqCurrentStep = 0;          
-unsigned long lastStepTime = 0;   
+#define MAX_STEPS 32
+
+struct AnimStep {
+    int duration;   // Milliseconds to transition
+    int brightness; // Target brightness (0-255)
+};
+
+AnimStep sequence[MAX_STEPS];
+int seqLength = 0;
+int currentStepIdx = 0;
+
+unsigned long stepStartTime = 0;
+float startBrightness = 0; // Float for smooth calculation
 
 // ==========================================
 // DRIVER CAPSULE
@@ -87,6 +91,7 @@ void adin_init() {
     pinMode(PIN_CS, OUTPUT); digitalWrite(PIN_CS, HIGH);
     pinMode(PIN_RST, OUTPUT); 
     adinSpi.begin(PIN_SCLK, PIN_MISO, PIN_MOSI, PIN_CS);
+
     digitalWrite(PIN_RST, LOW); delay(20);
     digitalWrite(PIN_RST, HIGH); delay(100);
 
@@ -135,47 +140,67 @@ char* adin_poll_frame() {
 }
 
 // ==========================================
-// SEQUENCER
+// ANIMATION LOGIC
 // ==========================================
 
 void process_sequence_command(char* payload) {
     if (strncmp(payload, "SEQ:", 4) != 0) return;
 
-    Serial.printf(">> [NEW SEQ] Parsing: %s\n", payload);
+    Serial.printf(">> [PROG] Parsing Program: %s\n", payload);
 
+    // Reset
     seqLength = 0;
+    
+    // Parse Pairs: Duration,Brightness
     char* token = strtok(payload + 4, ",");
-    while (token != NULL && seqLength < MAX_SEQ_STEPS) {
-        int duration = atoi(token);
-        if (duration > 0) {
-            seqDurations[seqLength] = duration;
+    while (token != NULL && seqLength < MAX_STEPS) {
+        int dur = atoi(token);
+        token = strtok(NULL, ",");
+        if (token != NULL) {
+            int bri = atoi(token);
+            sequence[seqLength].duration = dur;
+            sequence[seqLength].brightness = bri;
             seqLength++;
         }
         token = strtok(NULL, ",");
     }
 
     if (seqLength > 0) {
-        seqCurrentStep = 0;
-        lastStepTime = millis();
-        digitalWrite(PIN_LED, LED_ON); 
-        Serial.printf(">> [SEQ START] Loaded %d steps. Step 0 ON.\n", seqLength);
+        currentStepIdx = 0;
+        stepStartTime = millis();
+        // Start from current brightness to avoid jumps
+        // (startBrightness is already holding current value)
+        Serial.printf(">> [PROG] Loaded %d steps. Starting...\n", seqLength);
     }
 }
 
-void run_sequence_logic() {
+void run_animation() {
     if (seqLength == 0) return;
 
+    AnimStep target = sequence[currentStepIdx];
     unsigned long now = millis();
-    int currentDuration = seqDurations[seqCurrentStep];
+    unsigned long elapsed = now - stepStartTime;
 
-    if (now - lastStepTime >= currentDuration) {
-        lastStepTime = now;
+    if (elapsed >= target.duration) {
+        // Step Finished -> Set Final Brightness
+        ledcWrite(PWM_CHANNEL, target.brightness);
+        startBrightness = target.brightness; 
         
-        seqCurrentStep++;
-        if (seqCurrentStep >= seqLength) seqCurrentStep = 0; 
-
-        bool isStepOn = (seqCurrentStep % 2 == 0);
-        digitalWrite(PIN_LED, isStepOn ? LED_ON : LED_OFF);
+        // Move to Next Step
+        currentStepIdx++;
+        if (currentStepIdx >= seqLength) currentStepIdx = 0; // Loop
+        
+        stepStartTime = now;
+        
+        // If next step is duration 0, handle instantly in next loop
+    } else {
+        // Interpolate (Fade)
+        // Only if duration > 0, otherwise it's handled above
+        if (target.duration > 0) {
+            float progress = (float)elapsed / (float)target.duration;
+            float newBri = startBrightness + (progress * (target.brightness - startBrightness));
+            ledcWrite(PWM_CHANNEL, (int)newBri);
+        }
     }
 }
 
@@ -184,19 +209,19 @@ void run_sequence_logic() {
 // ==========================================
 void setup() {
     Serial.begin(115200); while(!Serial) delay(10);
-    Serial.println("\n=== ADIN1110 RECEIVER (PIN 2) ===");
+    Serial.println("\n=== ADIN1110 DIMMER RECEIVER ===");
     
-    pinMode(PIN_LED, OUTPUT);
-    digitalWrite(PIN_LED, LED_OFF);
-
-    // Startup Test (Verify pin works)
-    digitalWrite(PIN_LED, LED_ON); delay(200);
-    digitalWrite(PIN_LED, LED_OFF); delay(200);
-    digitalWrite(PIN_LED, LED_ON); delay(200);
-    digitalWrite(PIN_LED, LED_OFF);
+    // SETUP PWM
+    ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RES);
+    ledcAttachPin(PIN_LED, PWM_CHANNEL);
+    
+    // PWM Test (Fade In/Out once)
+    for(int i=0; i<255; i+=5) { ledcWrite(PWM_CHANNEL, i); delay(5); }
+    for(int i=255; i>0; i-=5) { ledcWrite(PWM_CHANNEL, i); delay(5); }
+    ledcWrite(PWM_CHANNEL, 0);
 
     adin_init();
-    Serial.println("System Ready.");
+    Serial.println("Ready for Programs.");
 }
 
 void loop() {
@@ -204,6 +229,6 @@ void loop() {
     if (msg != NULL) {
         process_sequence_command(msg);
     }
-    run_sequence_logic();
-    delay(1);
+    run_animation();
+    delay(1); // Keep loop tight for smooth anim
 }*/
