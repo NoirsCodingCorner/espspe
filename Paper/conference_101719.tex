@@ -6,26 +6,28 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
-\usepackage{listings} % Hinzugefügt für Code-Listings
+\usepackage{listings}
+\usepackage{url}
+\usepackage{booktabs} 
 
-% Konfiguration für Code-Darstellung
+% Configuration for Code Listings
 \lstset{
 	language=C++,
 	basicstyle=\ttfamily\scriptsize,
 	keywordstyle=\color{blue}\bfseries,
 	commentstyle=\color{green!60!black},
 	stringstyle=\color{purple},
-	breaklines=true,          % Bricht lange Zeilen automatisch um
-	postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}, % Zeigt Umbruch an
-	frame=lines,              % Rahmen nur oben/unten (sieht in Papers sauberer aus)
-	captionpos=b,             % Caption unten
-	numbers=left,             % Zeilennummern links
+	breaklines=true,
+	postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+	frame=lines,
+	captionpos=b,
+	numbers=left,
 	numberstyle=\tiny\color{gray},
 	numbersep=5pt,
-	xleftmargin=10pt,         % Platz für die Nummern lassen
-	framexleftmargin=10pt,    % Rahmen auch um die Nummern ziehen
+	xleftmargin=10pt,
+	framexleftmargin=10pt,
 	showstringspaces=false,
-	tabsize=2                 % Tabulatoren kleiner machen
+	tabsize=2
 }
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
@@ -33,11 +35,11 @@
 
 \begin{document}
 	
-	\title{Implementation of a 10BASE-T1L Interface for ESP32 Using ADIN1110\\
+	\title{Implementation of a Secure IIoT Gateway: 10BASE-T1L Interface for ESP32 Using ADIN1110\\
 		{\footnotesize \textsuperscript{*}Project conducted within the scope of "Schaltungstechnik 2"}
 	}
 	
-		\author{
+	\author{
 		\IEEEauthorblockN{Kilian Halbritter}
 		\IEEEauthorblockA{\textit{Elektro- und Informationstechnik } \\
 			\textit{TH Aschaffenburg}\\
@@ -60,17 +62,19 @@
 	\maketitle
 	
 	\begin{abstract}
-		The rise of Industry 4.0 requires robust, long-range communication protocols that extend beyond the capabilities of standard Wi-Fi or Bluetooth. Single Pair Ethernet (SPE), specifically the 10BASE-T1L standard, offers a solution with cable reaches up to 1000 meters. This paper details the design and implementation of a hardware interface connecting an ESP32 microcontroller to the Analog Devices ADIN1110 MAC-PHY. We present a custom PCB design utilizing a galvanic isolation transformer to ensure safety against Power over Ethernet (PoE) faults. Furthermore, a custom C++ driver architecture for the SPI protocol is proposed. Initial validation demonstrates correct power sequencing, although full SPI command verification remains a subject of ongoing debugging.
+		The rise of Industry 4.0 requires robust, long-range communication protocols that extend beyond the capabilities of standard Wi-Fi or Bluetooth. Single Pair Ethernet (SPE), specifically the 10BASE-T1L standard, offers a solution with cable reaches up to 1000 meters. This paper details the design and implementation of a hardware interface connecting an ESP32 microcontroller to the Analog Devices ADIN1110 MAC-PHY. We present a custom PCB design utilizing a galvanic isolation transformer to ensure safety against Power over Ethernet (PoE) faults. Furthermore, a platform-independent C++ driver architecture with a custom Layer 2 protocol was developed. The system was successfully validated, achieving stable 10 Mbps link speeds and demonstrating a real-time, web-controlled PWM actuator application via a secure gateway architecture.
 	\end{abstract}
 	
 	\begin{IEEEkeywords}
-		ESP32, ADIN1110, 10BASE-T1L, Single Pair Ethernet, SPI, Industrial IoT
+		ESP32, ADIN1110, 10BASE-T1L, Single Pair Ethernet, SPI, Industrial IoT, Gateway
 	\end{IEEEkeywords}
 	
 	\section{Introduction}
-	In the landscape of Industrial Internet of Things (IIoT), the "last mile" connectivity for sensors often poses a challenge. While wireless solutions like the ESP32 are versatile, they suffer from range limitations and susceptibility to interference in industrial environments. Standard Ethernet requires four pairs of wires and complex cabling. 
+	In the landscape of the Industrial Internet of Things (IIoT), the "last mile" connectivity for sensors poses a significant challenge. While wireless solutions like the ESP32 are versatile, they suffer from range limitations and susceptibility to interference in industrial environments. Conversely, standard Ethernet requires complex cabling and high component costs. 
 	
-	The IEEE 802.3cg (10BASE-T1L) standard addresses this by enabling 10 Mbps Ethernet over a single twisted pair with a reach of up to 1 km. This project aims to bridge the gap between low-cost microcontrollers and industrial SPE by integrating the Espressif ESP32 with the ADIN1110 MAC-PHY. The primary contribution of this work is the documentation of the hardware coupling strategy and the development of a platform-independent C++ driver structure.
+	The IEEE 802.3cg (10BASE-T1L) standard addresses this by enabling 10 Mbps Ethernet over a single twisted pair with a reach of up to 1 km. This project aims to bridge the gap between low-cost microcontrollers and industrial SPE by integrating the Espressif ESP32 with the ADIN1110 MAC-PHY. 
+	
+	A key contribution of this work is the implementation of a "Security Gateway" architecture. By hosting a local Web Server on the ESP32 (Transmitter) and relaying commands over SPE to a passive Receiver, the physical machine actuators are air-gapped from the wireless network, enhancing security in industrial control scenarios.
 	
 	\section{System Architecture}
 	
@@ -78,71 +82,148 @@
 	The system creates a bridge between the wireless capabilities of the ESP32 and the wired reliability of SPE.
 	
 	\subsubsection{Microcontroller Unit (MCU)}
-	The host controller is an ESP32-DevKitC. It is responsible for the application logic and managing the network stack. The ESP32 is powered via USB (5V), which is regulated internally to 3.3V. This 3.3V rail is utilized to supply the peripheral PHY logic, ensuring signal level compatibility without the need for additional level shifters.
+	The host controller is an ESP32-DevKitC. It is responsible for the application logic, hosting the WiFi Access Point, and managing the SPI bus. The ESP32 3.3V logic rail supplies the peripheral PHY I/O, ensuring signal level compatibility without level shifters.
 	
 	\subsubsection{PHY Integration (ADIN1110)}
-	The ADIN1110 was selected for its ultra-low power consumption and integrated MAC, which offloads processing from the ESP32. 
+	The ADIN1110 was selected for its ultra-low power consumption and integrated MAC, which offloads Ethernet frame processing from the ESP32.
 	\begin{itemize}
-		\item \textbf{Clocking:} The ADIN1110 is clocked by a dedicated external 25 MHz crystal oscillator to ensure precise timing independent of the MCU clock.
-		\item \textbf{Power Supply:} The PHY core requires 1.1V, which is generated internally or via a buck converter, while the VDDIO is supplied with 3.3V from the ESP32 to match the GPIO logic levels.
-		\item \textbf{Safety Isolation:} A critical design decision was the inclusion of an isolation transformer on the MDI (Medium Dependent Interface) side. This ensures that if the device is connected to a network segment carrying Power over Ethernet (PoE), high voltages do not damage the low-voltage ESP32 circuitry.
+		\item \textbf{Clocking:} The ADIN1110 utilizes an external 25 MHz crystal oscillator for precise timing.
+		\item \textbf{Safety Isolation:} A critical design decision was the inclusion of an isolation transformer on the MDI side. This protects the low-voltage ESP32 circuitry from potential high-voltage faults if connected to Power over Ethernet (PoE) segments.
 	\end{itemize}
+	
+	\subsection{Hardware Configuration Settings}
+	To ensure the correct operation of the ADIN1110 MAC-PHY within the designed circuit, specific hardware jumpers must be configured. Table \ref{tab:jumpers} details the function of each jumper and the operational state validated in this implementation.
+	
+	\begin{table}[htbp]
+		\caption{PCB Jumper Configuration}
+		\begin{center}
+			\begin{tabular}{|c|l|c|}
+				\hline
+				\textbf{Jumper} & \textbf{Function Description} & \textbf{Setting} \\
+				\hline
+				JP1 & \textbf{Power Supply} & High \\
+				& Enables power to the module. & (True) \\
+				\hline
+				JP2 & \textbf{SPI\_CFG1} & Low \\
+				& Determines SPI protocol mode. & (False) \\
+				\hline
+				JP3 & \textbf{TX2P4\_EN} & Low \\
+				& High: 1.0 V p-p only. & (False) \\
+				& Low: Supports 1.0 V \& 2.4 V p-p. & \\
+				\hline
+				JP4 & \textbf{SWPD\_EN} & High \\
+				& Software Power-Down Config. & (True) \\
+				& Low: Enter power-down on reset. & \\
+				\hline
+				JP5 & \textbf{MS\_SEL} & High \\
+				& Master/Slave Selection. & (True) \\
+				& High: Prefer Master. Low: Slave. & \\
+				\hline
+			\end{tabular}
+			\label{tab:jumpers}
+		\end{center}
+	\end{table}
+	
+	As shown in Table \ref{tab:jumpers}, the system is configured to support dual voltage amplitudes (JP3 Low) and prefers the Master role (JP5 High), which is typical for a gateway controller.
 	
 	\section{Software Implementation}
 	
-	\subsection{Development Environment}
-	The firmware is developed using PlatformIO, leveraging the flexibility of the Arduino framework within a professional IDE structure. This allows for rapid prototyping while maintaining C++ class structures.
+	\subsection{Driver Architecture: The "Capsule" Model}
+	To maintain code modularity, a "Capsule" driver architecture was implemented. This separates the low-level SPI register access from the high-level application logic. The driver supports the \textit{Generic SPI} protocol of the ADIN1110, managing the CRC appending and frame encapsulation transparently.
 	
-	\subsection{Driver Architecture}
-	To abstract the hardware specifics, a custom driver class `SPIDevice` was implemented. This class encapsulates the standard Arduino `SPI.h` library, providing methods for transaction management.
-	
-	The driver is designed to support the \textit{Generic SPI} protocol mode of the ADIN1110. This mode was chosen over the OPEN Alliance SPI protocol for the initial implementation phase to reduce protocol overhead and complexity during debugging.\\
-	
-	\begin{lstlisting}[caption={Header definition of the SPI abstraction layer}, label={lst:spi_header}]
-		class SPIDevice {
-			public:
-			SPIDevice(int csPin, uint32_t clockSpeed, 
-			byte bitOrder, byte dataMode);
-			void begin();
-			void beginTransaction();
-			void endTransaction();
-			void select();
-			void deselect();
-			byte transfer(byte data);
-			// Buffer operations for efficiency
-			void readBuffer(byte* buffer, int length);
-			void writeBuffer(const byte* buffer, int length);
+	\begin{lstlisting}[caption={Low-Level Register Access Implementation}, label={lst:spi_driver}]
+		uint32_t readReg(uint16_t regAddr) {
+			uint16_t header = 0x8000 | (regAddr & 0x1FFF);
+			// Header setup with CRC calculation
+			uint8_t headBuf[2] = { 
+				(uint8_t)(header >> 8), 
+				(uint8_t)(header & 0xFF) 
+			};
 			
-			private:
-			int _csPin;
-			SPISettings _settings;
-		};
+			adinSpi.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+			digitalWrite(PIN_CS, LOW);
+			// Full duplex transfer handling...
+			digitalWrite(PIN_CS, HIGH);
+			adinSpi.endTransaction();
+			return result;
+		}
 	\end{lstlisting}
 	
-	As shown in Listing \ref{lst:spi_header}, the class handles the Chip Select (CS) assertion and SPI settings configuration, ensuring that the ADIN1110 timing requirements are met before data transfer occurs.
+	As shown in Listing \ref{lst:spi_driver}, the driver manages the Chip Select (CS) assertion and SPI transaction integrity, including the specific 2-byte header required by the ADIN1110.
 	
-	\subsection{Signal Measurement}
-	For debugging and signal generation purposes, a PWM generation and frequency measurement routine was implemented on the ESP32 (utilizing GPIO 25 and 26). This subsystem serves to verify the ESP32's internal timing and interrupt handling capabilities, ensuring that the MCU is operating correctly before attempting high-speed SPI communication.
+	\subsection{Custom Layer 2 Protocol}
+	To minimize latency and overhead, a custom raw Ethernet protocol (EtherType 0x88B5) was devised rather than a full TCP/IP stack on the receiver side. The payload utilizes a lightweight sequence command structure:
+	\begin{itemize}
+		\item \textbf{Format:} 
+		\text{SEQ:Duration,Brightness, Duration, Brightness...}
+		\item \textbf{Logic:} This protocol defines an animation sequence where the receiver interpolates the LED brightness over the specified duration.
+	\end{itemize}
+	
+	\subsection{Fading Engine and PWM Control}
+	The receiver implements a non-blocking state machine that parses the incoming sequence. It utilizes the ESP32's \texttt{ledc} hardware peripheral to generate high-resolution PWM signals. A linear interpolation algorithm allows for smooth transitions (fading) between brightness states, enabling complex visual patterns like "breathing" or "strobe" effects.
+	
+	\subsection{Web Interface (AJAX)}
+	The sender unit hosts a WiFi Access Point and an asynchronous web server. The frontend utilizes the JavaScript Fetch API (AJAX) to send commands to the ESP32 without reloading the webpage. This provides a responsive user experience for manual brightness control and preset selection.
 	
 	\section{Results and Validation}
 	
-	\subsection{Hardware Verification}
-	Initial power-up tests confirmed the integrity of the power supply design. The ADIN1110 status LEDs are active, indicating that the internal regulators are functioning and the 25 MHz clock is oscillating stably. The 3.3V logic levels between the ESP32 and ADIN1110 were verified using a multimeter.
+	\subsection{Hardware Debugging and Via Repair}
+	During the initial assembly, the system failed to establish a link. A deep analysis of the PCB revealed a manufacturing defect: a non-conductive buried VIA on the carrier board, severing the SPI MISO line. After manually bridging this connection, full duplex communication was established. This highlights the importance of electrical continuity testing in prototype PCBs.
 	
-	\subsection{Communication Challenges}
-	Despite the electrical verification, the SPI communication is currently non-functional. The ESP32 successfully initiates SPI transactions (clock and MOSI signals active), but the ADIN1110 does not respond on the MISO line. 
+	\subsection{Signal Integrity and Speed Verification}
+	To verify the signal quality and the achieved data rate on the physical layer, an eye diagram measurement was conducted using an Agilent DSO-X 2002A digital storage oscilloscope. The probe was connected to the TX pins of the ADIN1110.
 	
-	Potential causes currently under investigation include:
+	Fig. \ref{fig:eye_diagram} shows the captured eye diagram. The analysis of the waveform reveals stable plateaus with a duration ($T_{sym}$) of approximately $133\,\text{ns}$ per symbol.
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.7\linewidth]{augendiagram}
+		\caption{Eye diagram measured at the TX interface. The five distinct voltage levels which most likely result from reflection showcase the transmission via PAM3 modulation.}
+		\label{fig:eye_diagram}
+	\end{figure}
+	
+	The resulting symbol rate (Baud rate) $f_{sym}$ is calculated as:
+	
+	\begin{equation}
+		f_{sym} = \frac{1}{T_{sym}} \approx \frac{1}{133 \times 10^{-9}\,\text{s}} \approx 7.5\,\text{MHz}
+	\end{equation}
+	
+	This result aligns perfectly with the \textbf{ADIN1110 datasheet} and the \textbf{IEEE 802.3cg} standard, which specify a symbol rate of $7.5\,\text{MBd}$ for 10BASE-T1L. To achieve the full $10\,\text{Mbit/s}$ throughput, the standard utilizes \textbf{PAM3 (Pulse Amplitude Modulation 3)} encoding.
+	
+	As clearly visible in Fig. \ref{fig:eye_diagram}, the signal utilizes three distinct voltage levels ($+1, 0, -1$). This observation definitively confirms that the ADIN1110 is correctly operating in PAM3 mode. While the eye diagram also exhibits intermediate artifacts, likely caused by reflections or backwards signaling in the test setup, the presence of the three primary and two secondary (intermediate) levels and the correct timing interval validates the successful physical layer integration.
+	
+	\subsection{Transmission Performance}
+	Link stability was verified over a 20-meter twisted pair cable. The ADIN1110 successfully negotiated a $10\,\text{Mbps}$ link. Throughput tests using the raw frame protocol confirmed that the SPI bus (running at $1\,\text{MHz}$) was the bottleneck, not the SPE link, which is sufficient for control applications.
+	The speed of transition therefore can be assumed to depend heavily on the ESP32s speed of writing into the ADIN1110s registers.
+	
+	\subsection{Application Demonstration}
+	To demonstrate the system's capability, a "Remote Industrial Actuator" scenario was constructed. 
+	
 	\begin{enumerate}
-		\item \textbf{Reset Timing:} The ADIN1110 requires a specific power-up reset sequence. The hardware reset pin might need a longer hold time controlled by the ESP32.
-		\item \textbf{SPI Mode Mismatch:} Although configured for Generic SPI, slight deviations in CPOL (Clock Polarity) or CPHA (Clock Phase) settings can prevent data latching.
-		\item \textbf{Protocol Header:} The generic SPI protocol requires a specific command header structure (Control + Address) which must be strictly adhered to.
+		\item \textbf{User Input:} A user connects to the ESP32 WiFi and selects a "Heartbeat" pattern via the web interface (Fig. \ref{fig:webpage}).
+		\item \textbf{Processing:} The Sender ESP32 translates this into the raw \texttt{SEQ} protocol.
+		\item \textbf{Transmission:} The frame is transmitted via 10BASE-T1L to the Receiver unit.
+		\item \textbf{Actuation:} The Receiver parses the frame and executes the smooth LED fading sequence (Fig. \ref{fig:blinkled}).
 	\end{enumerate}
 	
-	\section{Conclusion and Future Work}
-	This paper presented the design of a 10BASE-T1L node based on the ESP32. The hardware integration, specifically the safety-oriented transformer coupling and shared power architecture, proved robust during initial electrical testing. 
+	\begin{figure}[htbp]
+		\centering
+		% Placeholder for image
+		\includegraphics[width=0.7\linewidth]{webpage} 
+		\caption{The responsive Web Interface hosted on the Sender ESP32, allowing manual PWM control and preset selection.}
+		\label{fig:webpage}
+	\end{figure}
 	
-	Future work will focus exclusively on the firmware layer. The immediate next step is to use a logic analyzer to inspect the SPI bus and verify the command frame structure against the ADIN1110 datasheet. Once the register access is established, the full TCP/IP stack will be integrated to benchmark the throughput over a 1 km cable.
+	\begin{figure}[htbp]
+		\centering
+		% Placeholder for image
+		\includegraphics[width=0.7\linewidth]{blinkled}
+		\caption{The Receiver unit executing a PWM fading sequence transmitted via the 10BASE-T1L link.}
+		\label{fig:blinkled}
+	\end{figure}
+	
+	\section{Conclusion}
+	This paper presented the successful design of a 10BASE-T1L node based on the ESP32. The hardware integration, specifically the safety-oriented transformer coupling, proved robust after resolving manufacturing defects. The developed firmware architecture demonstrates that low-cost microcontrollers can effectively drive industrial SPE interfaces. The implementation of a custom Layer 2 protocol and a web-based control gateway illustrates the potential of this technology for secure, air-gapped industrial control systems.
 	
 	\section*{Acknowledgment}
 	We would like to thank the faculty of the "Schaltungstechnik 2" course for providing the resources and guidance to explore this advanced communication technology.

@@ -4,18 +4,30 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Hardware Design}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-A}1}Microcontroller Unit (MCU)}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-A}2}PHY Integration (ADIN1110)}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {III}Software Implementation}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Development Environment}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Driver Architecture}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Hardware Configuration Settings}{1}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces PCB Jumper Configuration}}{1}{}\protected@file@percent }
+\newlabel{tab:jumpers}{{I}{1}{}{table.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {III}Software Implementation}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Driver Architecture: The "Capsule" Model}{2}{}\protected@file@percent }
+\newlabel{lst:spi_driver}{{1}{2}{}{lstlisting.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Low-Level Register Access Implementation}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Custom Layer 2 Protocol}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Fading Engine and PWM Control}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Web Interface (AJAX)}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Results and Validation}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Hardware Debugging and Via Repair}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Signal Integrity and Speed Verification}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Eye diagram measured at the TX interface. The five distinct voltage levels which most likely result from reflection showcase the transmission via PAM3 modulation.}}{2}{}\protected@file@percent }
+\newlabel{fig:eye_diagram}{{1}{2}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Transmission Performance}{2}{}\protected@file@percent }
 \bibcite{b1}{1}
 \bibcite{b2}{2}
 \bibcite{b3}{3}
-\newlabel{lst:spi_header}{{1}{2}{}{lstlisting.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Header definition of the SPI abstraction layer}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Signal Measurement}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Results and Validation}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Hardware Verification}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Communication Challenges}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion and Future Work}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{2}{}\protected@file@percent }
-\gdef \@abspage@last{2}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Application Demonstration}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The responsive Web Interface hosted on the Sender ESP32, allowing manual PWM control and preset selection.}}{3}{}\protected@file@percent }
+\newlabel{fig:webpage}{{2}{3}{}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The Receiver unit executing a PWM fading sequence transmitted via the 10BASE-T1L link.}}{3}{}\protected@file@percent }
+\newlabel{fig:blinkled}{{3}{3}{}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{3}{}\protected@file@percent }
+\gdef \@abspage@last{3}
